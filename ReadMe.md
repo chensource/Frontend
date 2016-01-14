@@ -1,5 +1,8 @@
-## About TypeScript Sample ##
+# About Frontend Sample  #
+##
 
+	
+##TypeScript Sample##
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. [Hello TypeScript](https://github.com/SChen18/Frontend/tree/master/TypeScript/Hello%20TypeScript)
 
-1. [Hello TypeScript](https://github.com/SChen18/Frontend/tree/master/TypeScript/Hello%20TypeScript)
-2. [Raytracer](https://github.com/SChen18/Frontend/tree/master/TypeScript/Raytracer)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. [Raytracer](https://github.com/SChen18/Frontend/tree/master/TypeScript/Raytracer)
