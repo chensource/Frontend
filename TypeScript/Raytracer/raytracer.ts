@@ -227,10 +227,10 @@ class RayTracer {
             } else {
                 var illum = Vector.dot(livec, norm);
                 var lcolor = (illum > 0) ? Color.scale(illum, light.color)
-                    : Color.defaultColor;
+                : Color.defaultColor;
                 var specular = Vector.dot(livec, Vector.norm(rd));
                 var scolor = (specular > 0) ? Color.scale(Math.pow(specular, thing.surface.roughness), light.color)
-                    : Color.defaultColor;
+                : Color.defaultColor;
                 return Color.plus(col, Color.plus(Color.times(thing.surface.diffuse(pos), lcolor),
                     Color.times(thing.surface.specular(pos), scolor)));
             }
@@ -271,8 +271,8 @@ function defaultScene(): Scene {
 }
 
 function exec() {
-    var canv = document.createElement("canvas");
     canv.width = 256;
+    var canv = document.createElement("canvas");
     canv.height = 256;
     document.body.appendChild(canv);
     var ctx = canv.getContext("2d");
