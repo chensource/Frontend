@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>深入理解javascript原型和闭包</title>
+</head>
+<body>
+	<script type="text/javascript">
+	// function show(x) {
+	// 	console.log(typeof(x));											//undefinde
+	// 	console.log(typeof(10));										//number
+	// 	console.log(typeof("abc"));									//string
+	// 	console.log(typeof(true));									//boolean
+	// 																							//以上4种属于简单的值类型
+	// 	console.log(typeof(function(){}));					//function
+	// 	console.log(typeof([1,"2","a"]));						//object
+	// 	console.log(typeof(null));									//object
+	// 	console.log(typeof(new Number(10)));				//object
+	// }
+
+
+	// show();
+	function Foo(){};
+	var f1 = new Foo();
+	f1.a = 10;
+	Foo.prototype.a= 100;
+	Foo.prototype.b= 200;
+
+	console.log(f1.a);
+	console.log(f1.b);
+
+	</script>
+</body>
+</html>
