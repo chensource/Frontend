@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<title>Blog Template For Bootstrap</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- 新 Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="../css/bootstrap.min.css">
+	<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+	<link href="../favicon.ico" rel="icon">
+	<style type="text/css" media="screen">
+		/*
+		 * Globals
+		 */
+		body{
+			font-family: Georgia, "Times New Roman", Times, serif;
+			color: #555;
+		}
+
+		h1,.h1,
+		h2,.h2,
+		h3,.h3,
+		h4,.h4,
+		h5,.h5,
+		h6,.h6{
+			margin-top: 0;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			font-weight: normal;
+			color: #333;
+		}
+
+		/*
+		 *	Masthead for nav
+		 */
+		.blog-masthead{
+			background-color: #428bca;
+			--webkit-box-shadow: inset 0 -2px 5px rgba(0,0,0,.1);
+					-box-shadow: inset 0 -2px 5px rgba(0,0,0,.1);
+		}
+
+		/*
+		 * Nav Links
+		 */
+		.blog-nav-item{
+			position: relative;
+			display: inline-block;
+			padding: 10px;
+			font-weight: 500;
+			color: #cdddeb;
+		}
+		.blog-nav-item:hover,
+		.blog-nav-item:focus{
+			color: #fff;
+			text-decoration: none;
+		}
+
+		.blog-nav .active{
+			color: #fff;
+		}
+
+		.blog-nav .active:after{
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			width: 0;
+			height: 0;
+			margin-left: -5px;
+			vertical-align: middle;
+			content: " ";
+			border-right: 5px solid transparent;
+			border-bottom: 5px solid;
+			border-left: 5px solid transparent;
+		}
+
+	</style>
+</head>
+<body>
+	<div class="blog-masthead">
+		<div class="container">
+			<nav class="blog-nav">
+				<a href="#" class="blog-nav-item active">Home</a>
+				<a href="#" class="blog-nav-item">New features</a>
+				<a href="#" class="blog-nav-item">Press</a>
+				<a href="#" class="blog-nav-item">New hires</a>
+				<a href="#" class="blog-nav-item">About</a>
+			</nav>
+		</div>
+	</div>
+</body>
+</html>
