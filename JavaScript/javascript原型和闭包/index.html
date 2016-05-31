@@ -7,29 +7,102 @@
 	<title>深入理解javascript原型和闭包</title>
 </head>
 <body>
+	<frameset rows="160,*">
+		<frame src="frame.html" name="topFrame">
+		<frameset cols="50%,80%">
+				<frame src="http://baidu.com" name="leftFrame">
+				<frame src="a.html" name="rightFrame">
+			</frameset>
+	</frameset>
 	<script type="text/javascript">
-	// function show(x) {
-	// 	console.log(typeof(x));											//undefinde
-	// 	console.log(typeof(10));										//number
-	// 	console.log(typeof("abc"));									//string
-	// 	console.log(typeof(true));									//boolean
-	// 																							//以上4种属于简单的值类型
-	// 	console.log(typeof(function(){}));					//function
-	// 	console.log(typeof([1,"2","a"]));						//object
-	// 	console.log(typeof(null));									//object
-	// 	console.log(typeof(new Number(10)));				//object
+	// var pageWidth = window.innerWidth, 		//确定页面可见视图
+	// 	pageHeight = window.innerHeight;
+	// if(typeof pageWidth != "number"){
+	// 	if(document.compatMode == "CSS1Compat"){
+	// 		pageWidth = document.documentElement.clientWidth;
+	// 		pageHeight = document.documentElement.clientHeight;
+	// 	}else{
+	// 		pageWidth = document.body.clientWidth;
+	// 		pageHeight = document.body.clientHeight;
+	// 	}
 	// }
 
+	// var wroxWin = window.open("http://www.baidu.com/", "_blank","height=400,width=400,top=10,left=10,resizable=yes,status=yes,toolbar=yes,location=yes");
+	// wroxWin.close();
 
-	// show();
-	function Foo(){};
-	var f1 = new Foo();
-	f1.a = 10;
-	Foo.prototype.a= 100;
-	Foo.prototype.b= 200;
+	// setTimeout(function(){
+	// 	alert("1");
+	// },1000);
 
-	console.log(f1.a);
-	console.log(f1.b);
+	// var timeoutId = setTimeout(function(){
+	// 	alert("hello world");
+	// },1000);
+	// clearTimeout(timeoutId);
+
+	// setInterval(function(){
+	// 	console.log("1");
+	// },1000);
+
+	// var num = 0; //初始值
+	// var max = 10; //最大值
+	// //var intervalId = null; //间歇Id
+
+	// function incrementNumber(){
+	// 	num++;
+	// 	console.log(num);
+
+	// 	//如果执行次数未达到max设定的值,则设置另一次超时调用
+	// 	if(num < max){
+	// 		setTimeout(incrementNumber,500);
+	// 	}else{
+	// 		alert("done");
+	// 	}
+	// }
+
+	// setTimeout(incrementNumber,500);
+
+
+	// if(prompt("Are you sure?")){
+	// 	alert("I'm so glad you're sure!");
+	// }else{
+	// 	alert("I'm sorry to hear you're not sure!");
+	// }
+
+	// window.find();
+
+	//
+
+	//用以解析查询字符串，然后返回包含所有参数的一个对象：
+	function getQueryStringArgs(){
+		//取得查询字符串并去掉开头的问号
+		var qs = (location.search.length > 0 ? location.search.substring(1) : ""),
+		//保存的数据对象
+			args = {},
+		//取得每一项
+			items = qs.length ? qs.split("&") : [],
+			item = null,
+			name = null,
+			value = null,
+		//循环中使用
+			i = 0,
+			len = items.length;
+
+		for(i = 0;i < len; i++){
+			item = items[i].split("=");
+			name = decodeURIComponent(item[0]);
+			value = decodeURIComponent(item[1]);
+
+			if(name.length){
+				args[name] = value;
+			}
+		}
+		return args;
+	}
+
+	// var args = getQueryStringArgs();
+	// console.log(args);
+
+	// alert(args["qd"]);
 
 	</script>
 </body>
