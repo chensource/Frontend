@@ -1,215 +1,842 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!-- 新 Bootstrap 核心 CSS 文件 -->
-	<link rel="stylesheet" href="../../HTML/BootStrap/css/bootstrap.min.css">
-	<link rel="stylesheet" href="../../HTML/BootStrap/css/bootstrap-theme.min.css">
-	<title>深入理解javascript原型和闭包</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="../../HTML/BootStrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../HTML/BootStrap/css/bootstrap-theme.min.css">
+    <script src="../CommonJs.js"></script>
+    <title>深入理解javascript原型和闭包</title>
+    <style>
+        #main {
+            font-family: '微软雅黑';
+            margin: 0 auto;
+            width: 1200px;
+            height: 100%;
+            --webkit-box-sizing: border-box;
+            text-indent: -9999px;
+            moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
 
+        #left {
+            width: 500px;
+            background-color: #ccc;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            float: left;
+        }
+
+        #right {
+            width: 300px;
+            background-color: #fff;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            float: left;
+        }
+    </style>
 </head>
+
 <body>
-	<script src="../../HTML/BootStrap/js/jquery-2.1.4.min.js"></script>
-	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-	<script src="../../HTML/BootStrap/js/bootstrap.min.js"></script>
-	<script type="text/javascript">
-		// function hasPlugin(name){
-		// 	name = name.toLowerCase();
-		// 	for(var i = 0; i< navigator.plugins.length;i++){
-		// 		if(navigator.plugins[i].name.toLowerCase().indexOf(name)>-1){
-		// 			return true;
-		// 		}
-		// 	}
-		// 	return false;
-		// }
+    <form class="" action="index.html" id="form1" method="post">
+        <input type="text" name="username" size="10" pattern="\d+" maxLength="10" id="text-box1" placeHolder="text-indent" value="" required>
+        <input type="text" name="userpassword" size="5" maxLength="10" id="text-box2" placeHolder="text-indent" value="">
+        <textarea name="textarea-box" rows="8" id="text-box" cols="40">initial value</textarea>
+        <ul>
+            <li>
+                <input type="radio" name="color" value="red">Red</li>
+            <li>
+                <input type="radio" name="color" value="green">Green</li>
+            <li>
+                <input type="radio" name="color" value="blue">Blue</li>
+        </ul>
+        <!-- <input type="submit" id="submit-btn" name="submit-btn" value="提交"> -->
+        <input type="button" id="btn-submit" name="name" value="按钮">
+        <div style="margin:10px auto;">
+            <select name="location" id="selLocation">
+                <option value="Sunnyvale, CA">Sunnyvale</option>
+                <option value="Los Angeles, CA">Los Angeles</option>
+                <option value="Mountain View, CA">Mountain View</option>
+                <option value="">China</option>
+                <option>Australia</option>
+            </select>
+        </div>
+    </form>
+    <script src="../../HTML/BootStrap/js/jquery-2.1.4.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="../../HTML/BootStrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
 
-		// alert(hasPlugin("Awesome Screenshot"));
-		//history.go("http://www.baidu.com");
-		//history.go(-1);
+        var $form = document.forms[0];
+        // console.log(serialize($form));
+        var $btnsubmit = $form.elements["btn-submit"];
+        EventUtil.addHandler($btnsubmit,"click",function(){
+            console.log(serialize($form));
+        })
+        // var selectindex = $selectbox.selectedIndex;
+        // var $selectOption = $selectbox.options[selectindex];
+        // var $text = $selectOption.text;
+        // var $value = $selectOption.value;
+        // alert($text);
 
-		//alert(history.length);
+        function serialize(form) {
+            var parts = [],
+                field = null,
+                i,
+                len,
+                j,
+                optLen,
+                option,
+                optValue;
+            for (i = 0, len = form.elements.length; i < len; i++) {
+                field = form.elements[i];
+                switch (field.type) {
+                    case "select-one":
+                    case "select-multiple":
+                        if (field.name.length) {
+                            for (j = 0, optLen = field.options.length; j < optLen; j++) {
+                                option = field.options[j];
+                                if (option.selected) {
+                                    optValue = "";
+                                    if (option.hasAttribute) {
+                                        optValue = (option.hasAttribute("value") ? option.value : option.text);
+                                    } else {
+                                        optValue = (option.attributes["value"].specified ? option.value : option.text);
+                                    }
+                                    parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(optValue));
+                                }
+                            }
+                        }
+                        break;
+                    case undefined: //自段集
+                    case "file": //文件输入
+                    case "submit": //提交按钮
+                    case "reset": //重置按钮
+                    case "button": //自定义按钮
+                        break;
+                    case "radio":
+                    case "checkbox":
+                        if (!field.checked) {
+                            break;
+                        }
+                        /* 执行默认操作 */
+                    default:
+                        //不包含没有名字的表单字段
+                        if (field.name.length) {
+                            parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
+                        }
+                }
+            }
+            return parts.join("&");
+        }
 
-		//IE5.0 之前的版本不支持document.getElementById()这个DOM 方法
-		// function getElementById(id){
-		// 	if(document.getElementById){
-		// 		return document.getElementById(id);
-		// 	}else if(document.all){
-		// 		return document.all[id];
-		// 	}else{
-		// 		throw new Error("no way to retrieve element!");
-		// 	}
-		// }
-		// var hasDOM1 = Boolean((document.getElementById && document.createElement && document.getElementsByTagName));
+        // alert($text);
+        // var isPatternSupported = "pattern" in document.createElement("input");
+        // alert(isPatternSupported);
+        // var $form = document.getElementById("form1");
+        // var $field = $form.elements[0];
 
-		// alert(hasDOM1);
+        // var $textbox = $form.elements["text-box"];
+        // EventUtil.addHandler($textbox, "focus", function(event) {
+        // 	event = EventUtil.getEvent(event);
+        // 	var target = EventUtil.getTarget(event);
+        // 	if (target.style.backgroundColor != "red") {
+        // 		target.style.backgroundColor = "yellow";
+        // 	}
+        // });
+        // EventUtil.addHandler($textbox, "blur", function(event) {
+        // 	event = EventUtil.getEvent(event);
+        // 	var target = EventUtil.getTarget(event);
+        // 	if (/[^\d]/.test(target.value)) {
+        // 		target.style.backgroundColor = "red";
+        // 	} else {
+        // 		target.style.backgroundColor = "";
+        // 	}
+        // });
+        // EventUtil.addHandler($textbox, "change", function(event) {
+        // 	event = EventUtil.getEvent(event);
+        // 	var target = EventUtil.getTarget(event);
+        // 	if (/[^\d]/.test(target.value)) {
+        // 		target.style.backgroundColor = "red";
+        // 	} else {
+        // 		target.style.backgroundColor = "";
+        // 	}
+        // });
+
+        // var $textarea = $form.elements["textarea-box"];
+        //文本框就会忽略所有输入的非数值
+        // EventUtil.addHandler($textarea, "keypress", function(event) {
+        // 	event = EventUtil.getEvent(event);
+        // 	var target = EventUtil.getTarget(event);
+        // 	var charCode = EventUtil.getCharCode(event);
+        // 	// alert(event.keycode === 13);
+        // 	if (!/\d/.test(String.fromCharCode(charCode)) && charCode > 9 && !(event.keycode === 13)) {
+        // 		EventUtil.preventDefault(event);
+        // 	}
+        // });
+
+        // EventUtil.addHandler($textarea,"paste",function(event){
+        // 	event = EventUtil.getEvent(event);
+        // 	var text = EventUtil.getClipboardText(event);
+        //     EventUtil.preventDefault(event);
+        // 	alert("不能粘贴数据");
+        // })
+
+        // (function(){
+        //     function tabForward(event) {
+        //         event = EventUtil.getEvent(event);
+        //         // alert(event);
+        //         var target = EventUtil.getTarget(event);
+        //
+        //         if(target.value.length == target.maxLength){
+        //             var $form = target.form;
+        //             for (var i = 0 , len = $form.elements.length; i < len; i++) {
+        //                 if($form.elements[i] == target){
+        //                     if($form.elements[i+1]){
+        //                         $form.elements[i+1].focus();
+        //                     }
+        //                     return;
+        //                 }
+        //             }
+        //         }
+        //     }
+        //
+        //     var textbox1 = document.getElementById("text-box1");
+        //     var textbox2 = document.getElementById("text-box2");
+        //     var textbox3 = document.getElementById("text-box3");
+        //
+        //     EventUtil.addHandler(textbox1,"keyup",tabForward);
+        //     EventUtil.addHandler(textbox2,"keyup",tabForward);
+        //     EventUtil.addHandler(textbox3,"keyup",tabForward);
+        // })();
+
+        // var range = $textarea.createTextRange();
+        // range.collapse(true);
+        // range.moveStart("character",0);
+        // range.moveEnd("character",$textarea.value.length);
+        // range.select();
+        // alert($textarea.value);
+
+        // EventUtil.addHandler($textarea,"focus",function(event){
+        //	 event = EventUtil.getEvent(event);
+        //	 var target = EventUtil.getTarget(event);
+        //	 target.select();
+        // });
+
+        // EventUtil.addHandler($textarea,"select",function(event){
+        //	 // alert("text selectd : " + $textarea.value);
+        //	 // alert(getSelectText($textbox));
+        //	 // event = EventUtil.getEvent(event);
+        //	 // var target = EventUtil.getTarget(event);
+        //	 // target.select();
+        // });
+        // alert(getSelectText($textbox));
+        // function getSelectText(textbox){
+        //	 return textbox.value.substring(textbox.selectionStart,textbox.selectionEnd);
+        // }
+
+        // function selectText(textbox, startIndex, stopIndex) {
+        // 	if (textbox.setSelectionRange) {
+        // 		textbox.setSelectionRange(startIndex, stopIndex);
+        // 	} else {
+        // 		var range = textbox.createTextRange();
+        // 		range.collapse(true);
+        // 		range.moveStart("character", startIndex);
+        // 		range.moveEnd("character", stopIndex - startIndex);
+        // 		range.select();
+        // 	}
+        // 	textbox.focus();
+        // }
+
+        // selectText($textarea, 4, 7); //"Hello world!"
+
+        // $field.value = "Another value";
+        // console.log($field.form === $form);
+        // $field.focus();
+        // $field.disabled = true;
+        // $field.type = "checkbox";
+        // EventUtil.addHandler($form, "submit", function(event) {
+        //	 event = EventUtil.getEvent(event);
+        //	 var target = EventUtil.getTarget(event);
+        //	 //取得提交按钮
+        //	 var btn = target.elements["submit-btn"];
+        //	 btn.disabled = true;
+        //	 //阻止表单事件的提交
+        //	 // EventUtil.preventDefault(event);
+        // });
+
+        // EventUtil.addHandler(window,"load",function(event){
+        //	 var element = document.forms[0].elements[0];
+        //	 if (element.autofocus !== true) {
+        //		 element.focus();
+        //		 console.log("JS Focus.");
+        //	 }
+        // });
+        // var colorFields = $form.elements["color"];
+        // var firstColorField = colorFields[0];
+        // var firstFormField = $form.elements[0];
+        // alert(firstFormField === firstColorField);
+        // var EventUtil = {
+        //	 addHandler: function(element, type, handler) {
+        //		 if (element.addEventListener) {
+        //			 element.addEventListener(type, handler, false);
+        //		 } else if (element.attachEvent) {
+        //			 element.attachEvent("on" + 　type, handler);
+        //		 } else {
+        //			 element["on" + type] = handler;
+        //		 }
+        //	 },
+        //	 removeHandler: function(element, type, handler) {
+        //		 if (element.removeEventListener) {
+        //			 element.removeEventListener(type, handler, false);
+        //		 } else if (element.detachEvent) {
+        //			 element.datachEvent("on" + type, handler);
+        //		 } else {
+        //			 element["on" + type] = null;
+        //		 }
+        //	 },
+        //	 getEvent: function(event) {
+        //		 return event ? event : window.event;
+        //	 },
+        //	 getTarget: function(event) {
+        //		 return event.getTarget || event.srcElement;
+        //	 },
+        //	 preventDefault: function(event) {
+        //		 if (event.preventDefault) {
+        //			 event.preventDefault();
+        //		 } else {
+        //			 event.returnValue = false;
+        //		 }
+        //	 },
+        //	 stopPropagation: function(event) {
+        //		 if (event.stopPropagation) {
+        //			 event.stopPropagation();
+        //		 } else {
+        //			 event.cancelBubble = true;
+        //		 }
+        //	 },
+        //	 getWheelDelta: function(event) {
+        //		 if (event.wheelDelta) {
+        //			 return (client.engine.opera && client.engine.opera < 9.5 ? -event.wheelDelta : event.wheelDelta);
+        //		 } else {
+        //			 return -event.detail * 40;
+        //		 }
+        //	 },
+        //	 getButton: function(event) {
+        //		 if (document.implementation.hasFeature("MouseEvents", "2.0")) {
+        //			 return event.button;
+        //		 } else {
+        //			 switch (event.button) {
+        //				 case 0:
+        //				 case 1:
+        //				 case 3:
+        //				 case 5:
+        //				 case 7:
+        //					 return 0;
+        //				 case 2:
+        //				 case 6:
+        //					 return 2;
+        //				 case 4:
+        //					 return 1;
+        //			 }
+        //		 }
+        //	 },
+        //	 getCharCode: function(event) {
+        //		 if (typeof event.charCode == "number") {
+        //			 return event.charCode;
+        //		 } else {
+        //			 return event.keyCode;
+        //		 }
+        //	 }
+        // };
+        //
+        // function handleTouchEvent(event){
+        //	 if(event.touches.length == 1){
+        //		 var output = document.getElementById("output");
+        //		 switch (event.type) {
+        //			 case "touchstart":
+        //				 output.innerHTML = "Touch started ("+event.touches[0].clientX+",<br />"+event.touches[0].clientY+")";
+        //				 break;
+        //			 case "touchend" :
+        //				 output.innerHTML += "<br /> Touch ended ("+event.changedTouches[0].clientX+",<br />"+event.changedTouches[0].clientY+")";
+        //				 break;
+        //			 case "touchmove":
+        //				 event.preventDefault();
+        //				 output.innerHTML += "<br /> Touch moved ("+event.changedTouches[0].clientX+",<br />"+event.changedTouches[0].clientY+")";
+        //				 break;
+        //		 }
+        //	 }
+        // }
+        //
+        // function handleGestureEvent(event) {
+        //	 var output = document.getElementById("output");
+        //	 switch (event.type) {
+        //		 case "gesturestart":
+        //			 output.innerHTML = "Gesturestart started (rotation="+event.rotation+",scale="+event.scale+")";
+        //			 break;
+        //		 case "gestureend":
+        //			 output.innerHTML += "<br />Gesture ended (rotation="+event.rotation+",scale="+event.scale+")";
+        //			 break;
+        //		 case "gesturechange":
+        //			 output.innerHTML += "Gesture change (rotation="+event.rotation+",scale="+event.scale+")";
+        //			 break;
+        //	 }
+        // }
+        //
+        // var $list = document.getElementById("myMenu");
+        //
+        // EventUtil.addHandler($list,"click",function(event){
+        //	 event = EventUtil.getEvent(event);
+        //	 var target = EventUtil.getTarget(event);
+        //
+        //	 switch (target.id) {
+        //		 case "doSomething":
+        //			 document.title = "I changed the document's title";
+        //			 break;
+        //		 case "goSomewhere":
+        //			 location.href = "http://www.baidu.com";
+        //			 break;
+        //		 case "sayHi":
+        //			 alert("hi");
+        //			 break;
+        //	 }
+        // })
+
+        // document.addEventListener("gesturestart",handleGestureEvent,false);
+        // document.addEventListener("gestureend",handleGestureEvent,false);
+        // document.addEventListener("gesturechange",handleGestureEvent,false);
+        // EventUtil.addHandler(document,"touchstart",handleTouchEvent);
+        // EventUtil.addHandler(document,"touchend",handleTouchEvent);
+        // EventUtil.addHandler(document,"touchmove",handleTouchEvent);
+        // var $link = document.getElementById("myLink");
+        // var $right = document.getElementById("right");
+        // var $text = document.getElementById("myText");
+
+        // EventUtil.addHandler($text, "keypress", function(event) {
+        //	 event = EventUtil.getEvent(event);
+        //	 alert(EventUtil.getCharCode(event));
+        // });
+
+        // EventUtil.addHandler($text, "keypress", function(event) {
+        //	 event = EventUtil.getEvent(event);
+        //	 var identifier = event.key || event.keyIdentifier;
+        //	 if (identifier) {
+        //		 alert(identifier);
+        //	 }
+        // });
+
+        // EventUtil.addHandler($text, "compositionstart", function(event) {
+        //	 event = EventUtil.getEvent(event);
+        //	 alert(event.data);
+        //	 // alert(event.inputMethod);
+
+        //	 // var loc = event.location || event.keyLocation;
+        //	 // if (loc) {
+        //	 //	 alert(loc);
+        //	 // }
+        // });
 
 
-		var client = function(){
-			var engine = {
-				//呈现引擎
-				ie: 0,
-				gecko: 0,
-				webkit: 0,
-				khtml: 0,
-				opera: 0,
-				//具体的版本号
-				ver: null
-			};
 
-			var browser = {
-				//浏览器
-				ie: 0,
-				firefox: 0,
-				safari: 0,
-				konq: 0,
-				opera: 0,
-				chrome: 0,
+        // EventUtil.addHandler(window,"load",function(event){
+        //	 var $div = document.getElementById("myDiv");
 
-				//具体的版本号
-				ver: null
-			};
+        //	 EventUtil.addHandler($div,"contextmenu",function(event){
+        //		 event = EventUtil.getEvent(event);
+        //		 EventUtil.preventDefault(event);
 
-			var system = {
-				//平台
-				win: false,
-				mac: false,
-				x11: false,
-				//移动设备
-				iphone: false,
-				ipod: false,
-				ipad: false,
-				ios: false,
-				android: false,
-				nokiaN: false,
-				winMobile: false,
-				//游戏版本
-				wii: false,
-				ps: false
-			};
+        //		 var $menu = document.getElementById("myMenu");
+        //		 $menu.style.left = event.clientX + "px";
+        //		 $menu.style.top = event.clientY + "px";
+        //		 $menu.style.visibility = "visible";
+        //	 });
 
-			//在此检测呈现引擎,浏览器,平台和设备
-			/**
-			 * 先检测 Opera 浏览器.如果是Opera 浏览器.window.opera的值为true;
-			 * 第二个检测的应该是　WebKit 代码首先将用户代理字符串保存在变量ua 中。然后通过正则表达式来测试其中是否包含字符串"AppleWebKit"，并使用捕获组来取得版本号
-			 * 接下来要测试的呈现引擎是KHTML,由于KHTML 的版本号与后继的标记之间有一个空格，因此仍然要使用特殊的非空格字符来取得与版本有关的所有字符
-			 * Gecko 的版本号位于字符串"rv:"与一个闭括号之间，因此为了提取出这个版本号
-			 * IE 的版本号位于字符串"MSIE"的后面、一个分号的前面
-			 */
-			var ua = navigator.userAgent;
-			if(window.opera){
-				engine.ver = browser.ver = window.opera.version();
-				engine.opera = browser.opera = parseFloat(engine.ver);
-			}else if (/AppleWebKit\/(\S+)/.test(ua)){
-				engine.ver = RegExp["$1"];
-				engine.webkit = parseFloat(engine.ver);
+        //	 EventUtil.addHandler(document,"click",function(event){
+        //		 document.getElementById("myMenu").style.visibility = "hidden";
+        //	 });
+        // });
 
-				//确定是Chrome 还是 Safari
-				if (/Chrome\/(\S+)/.test(ua)){
-					browser.ver = RegExp["$1"];
-					browser.chrome = parseFloat(browser.ver);
-				} else if (/Version\/(\S+)/.test(ua)){
-					browser.ver = RegExp["$1"];
-					browser.safari = parseFloat(browser.ver);
-				} else {
-					var safariVesion = 1;
-					if (engine.webkit < 100) {
-						safariVesion = 1;
-					} else if (engine.webkit < 312) {
-						safariVesion = 1.2;
-					} else if (engine.webkit < 412) {
-						safariVesion = 1.3;
-					}else {
-						safariVesion = 2;
-					}
+        // var isSupported = document.implementation.hasFeature("CompositionEvent", "3.0");
+        // alert(isSupported);
 
-					browser.safari = browser.ver = safariVesion;
-				}
-			} else if (/KHTML\/(S+)/.test(ua)){
-				engine.ver = browser.ver = RegExp["$1"];
-				engine.khtml = browser.konq = parseFloat(engine.ver);
-			} else if (/rv:([^\)]+)\) Gecko\/\d{8}/.test(ua)){
-				engine.ver = RegExp["$1"];
-				engine.gecko = parseFloat(engine.ver);
+        // EventUtil.addHandler(document,"mousewheel",function(event){
+        //	 event = EventUtil.getEvent(event);
+        //	 alert(event.wheelDelta);
+        // });
+        // (function() {
+        //	 function handleMouseWheel(event){
+        //		 event = EventUtil.getEvent(event);
+        //		 var delta = -event.detail * 40;
+        //		 alert(delta);
+        //	 }
+        // })();
+        // $right.onclick = function(event){
+        // event = EventUtil.getEvent(event);
+        //	  alert(event);
+        //	  var target = EventUtil.getTarget(event);
+        //	  console.log(target);
+        //	  EventUtil.stopPropagation(event);
+        // }
 
-				//确定是不是Firefox浏览器
-				if(/Firefox\/(\S+)/.test(ua)){
-					browser.ver = RegExp["$1"];
-					browser.firefox = parseFloat(browser.ver);
-				}
-			} else if (/MSIE ([^;]+)/.test(ua)){
-				engine.ver = browser.ver = RegExp["$1"];
-				engine.ie = browser.ie =  parseFloat(engine.ver);
-			}
+        // document.body.onclick = function(event){
+        //	 alert("1");
+        // };
 
-			var platform = navigator.platform;
-			system.win = platform.indexOf("Win") == 0;
-			system.mac = platform.indexOf("Mac") == 0;
-			system.x11 = (platform.indexOf("X11") == 0 || platform.indexOf("Linux") == 0);
-			system.iphone = ua.indexOf("iPhone") > -1;
-			system.ipad = ua.indexOf("iPad") > -1;
-			system.ipod = ua.indexOf("iPod") > -1;
-			system.nokiaN = ua.indexOf("NokiaN") > -1;
+        // EventUtil.addHandler(window,"load",function(){
+        //	 alert("Load Success");
+        // });
+
+        // var $image = document.getElementsByName("myImage")[0];
+        // EventUtil.addHandler(window,"load",function(){
+        //	 var $newImage = document.createElement("img");
+        //	 var $image = document.getElementsByName("myImage")[0];
+        //	 EventUtil.addHandler($image,"load",function(event){
+        //		 event = EventUtil.getEvent(event);
+        //		 alert(EventUtil.getTarget(event).src);
+        //	 });
+        //	 document.body.appendChild($newImage);
+        //	 $newImage.src = "http://dummyimage.com/600x400/000/fff";
+        // });
+
+        // EventUtil.addHandler(window,"load",function(){
+        //	 var $script = document.createElement("script");
+        //	 EventUtil.addHandler($script,"load",function(event){
+        //		 alert("Loaded");
+        //	 });
+        //	 $script.src = "example.js";
+        //	 document.boay.appendChild($script);
+        // });
+
+        // EventUtil.addHandler(window,"resize",function(){
+        //	 // alert("resize");
+        // });
 
 
-			if (system.win) {
-				if (/Win(?:dows )?([^do]{2})\s?(\d+\.\d+)?/.test(ua)) {
-					if (RegExp["$1"] == "NT") {
-						switch (RegExp["$2"]) {
-							case "5.0":
-								system.win = "2000";
-								break;
-							case "5.1":
-								system.win = "XP";
-								break;
-							case "6.0":
-								system.win = "Vista";
-								break;
-							case "6.1":
-								system.win = "7";
-								break;
-							default:
-								system.win = "NT";
-								break;
-						}
-					} else if(RegExp["$1"] == "9x") {
-						system.win = "ME";
-					} else {
-						system.win = RegExp["$1"];
-					}
-				}
-			}
+        // EventUtil.addHandler(window,"scroll",function(){
+        //	 if (document.compatMode == "CSS1Compat") {
+        //		 alert(document.documentElement.scrollTop);
+        //	 } else {
+        //		 alert(document.body.scrollTop);
+        //	 }
+        // });
 
-			if (system.mac && ua.indexOf("Mobile") > -1) {
-				if(/CPU (?:iPhone )?OS (\d+_\d+)/.test(ua)){
-					system.ios = parseFloat(RegExp.$1.replace("_", "."));
-				}else{
-					system.ios = 2;
-				}
-			}
 
-			if (/Android (\d+\.\d+)/.test(ua)) {
-				system.android = parseFloat(RegExp["$1"]);
-			}
 
-			if (system.win == "CE") {
-				system.winMobile = system.win;
-			} else if(system.win == "Ph"){
-				if(/Windows Phone?OS (\d+\.\d+)/.test(ua)){
-					system.win = "Phone";
-					system.winMobile = parseFloat(RegExp["$1"]);
-				}
-			}
 
-			system.wii = ua.indexOf("wii") > -1;
-			system.ps = /playstation/i.test(ua);
+        // var $div = document.getElementById("myDiv");
 
-			return {
-				engine: engine,
-				browser: browser,
-				system: system
-			};
-		}();
-	</script>
+        // $div.onclick = function(event){
+        //	 alert(event.currentTarget === this);
+        //	 alert(event.target === this);
+        // }
+        // var handler = function(){
+        //	 alert("clicked");
+        // }
+        // EventUtil.addHandler($div,"click",handler);
+        // EventUtil.removeHandler($div,"click",handler);
+        // $div.onclick = function(){
+        //	 alert(this.id);
+        // };
+        // $div.addEventListener("click",function(){
+        //	 // alert(event.type);
+        //	 // event.stopPropagation();
+        //	 alert("client :" + event.clientX + "," + event.clientY);
+        // },false);
+
+        // document.body.onclick = function(event){
+        //	 var keys = new Array();
+
+        //	 if(event.shiftKey){
+        //		 keys.push("shift");
+        //	 }
+
+        //	 if(event.ctrlKey){
+        //		 keys.push("ctrl");
+        //	 }
+
+        //	 if(event.altKey){
+        //		 keys.push("alt");
+        //	 }
+
+        //	 if(event.metaKey){
+        //		 keys.push("meta");
+        //	 }
+
+        //	 alert("keys :" + keys.join("+"));
+
+        //	 // alert("body clicked");
+        // }
+        // function getElementLeft(element){
+        //	 var actualLeft = element.offsetLeft;
+        //	 var current = element.offsetParent;
+
+        //	 while(current !== null){
+        //		 actualLeft += current.offsetLeft;
+        //			   current = current.offsetParent;
+        //	 }
+        //		   return actualLeft;
+        // }
+
+        // function getViewReport() {
+        //	 if (document.compatMode == "BackCompat") {
+        //		 return {
+        //			 width: document.body.clientWidth,
+        //			 height: document.body.clientHeight
+        //		 };
+        //	 } else {
+        //		 return {
+        //			 width: document.documentElement.clientWidth,
+        //			 height: document.documentElement.clientHeight
+        //		 };
+        //	 }
+        // }
+        //
+        // getViewReport.width();
+        //
+        // alert(getViewReport.width());
+
+        // var $link = document.getElementsByTagName("link")[0];
+        // var $sheet = getStyleSheet($link);
+        // document.write($sheet.href);
+        // alert($sheet.href);
+        // $div.style.border = "1px solid #000";
+        // function getStyleSheet(elements) {
+        //	 return elements.sheet || elements.stylesheet;
+        // }
+
+        // var $link = document.getElementsByTagName("link")[0];
+        // var $sheet = getStyleSheet($link);
+        // alert($sheet.html());
+        // alert("1");
+        // var $div = document.getElementById("myDiv");
+        // $div.style.backgroundColor = "red";
+        // $div.style.height = "100px";
+        // $div.style.width = "200px";
+        // $div.style.border = "1px solid #000";
+        // function getStyleSheet(elements) {
+        //	 return elements.sheet || elements.stylesheet;
+        // }
+
+        // var $link = document.getElementsByTagName("link")[0];
+        // var $sheet = getStyleSheet($link);
+        // alert($sheet.html());
+
+        //我还想多活几年
+        // var supportDOM2Core = document.implementation.hasFeature("Core","2.0");
+        // var supportDOM3Core = document.implementation.hasFeature("Core","3.0");
+        // var supportDOM2Html = document.implementation.hasFeature("HTML","2.0");
+        // var supportDOM2Views = document.implementation.hasFeature("Views","2.0");
+        // var supportDOM2XML = document.implementation.hasFeature("XML","2.0");
+        // console.log("supportDOM2Core :" + supportDOM2Core);
+        // console.log("supportDOM3Core :" + supportDOM3Core);
+        // console.log("supportDOM2Html :" + supportDOM2Html);
+        // console.log("supportDOM2Views :" + supportDOM2Views);
+        // console.log("supportDOM2XML :" + supportDOM2XML);
+
+        // var $div = document.getElementById("myDiv");
+        // console.log($div.outerHTML);
+
+        /**
+        	 <div id="myDiv" class="bd user disabled" data-appid="123456" title="Body Text" lang="en" dir="ltr">
+        			 <p>This is a <strong>paragraph</strong> with a list following it.</p>
+        			 <ul>
+        				 <li>Item 1</li>
+        				 <li>Item 2</li>
+        				 <li>Item 3</li>
+        			 </ul>
+        		 </div>
+        		 */
+        // var classNames = $div.className.split(/\s+/);
+        // alert(classNames.length);
+        // alert($div.className);
+
+        /**
+         * 移除某一个Class 样式
+         */
+        // var $div = document.getElementById("myDiv");
+        // var pos = -1,
+        //	 i,
+        //	 len;
+        // for(i = 0 , len = classNames.length; i < len; i++){
+        //	 if(classNames[i] == "user"){
+        //		 pos = i;
+        //		 break;
+        //	 }
+        // }
+        // classNames.splice(i,1);
+        // $div.className = classNames.join(" ");
+
+        // $div.classList.remove("usetr");
+        // alert($div.className);
+        // alert($div.dataset.appid);
+        // if($div.dataset.appid){
+        //	 alert($div.dataset.appid);
+        // }
+        // var head  = document.head || document.getElementsByTagName("head")[0];
+        // alert(head);
+
+        // var reg = /(?!^\d+$)(?!^[a-zA-Z]+$)^[0-9a-zA-Z]{6,30}$/;
+        // var val = "21312ddd3";
+        // if(val.length < 6 || val.length > 30){
+        //	 alert(false);
+        // }else{
+        //	 alert(reg.test(val));
+        // }
+
+        // var $ul = document.querySelector("ul");
+        // alert($li.length);
+        // function processChild(element){
+        //	 var i,
+        //		 len,
+        //		 child = element.firstElementChild;
+        //	 while(child != element.lastElementChild){
+        //		 processChild(child);
+        //		 child = child.nextElementSibiling;
+        //	 }
+        // }
+
+        //processChild($ul);
+
+        // var $body = document.querySelector("body");
+        // alert($body.nodeName);
+
+        // var $li = document.querySelectorAll("li");
+        // alert($li.length);
+
+        // var $divByClass = document.querySelector(".bd");
+        // // alert($divByClass.nodeName);
+        // if (document.readyState == "loading"){
+        //	 alert("loading");
+        // } else {
+        //	 alert("complete");
+        // }
+        // var $element = document.querySelector("#myList").querySelectorAll("li");
+        // alert($element.length);
+
+        //	 var $element = document.getElementsByClassName("bd");
+        // alert($element.nodeValue);
+        // function loadStyles(url){
+        //	 var link = document.createElement("link");
+        //	 link.rel = "stylesheet";
+        //	 link.type = "text/css";
+        //	 link.href = url;
+        //	 var head = document.getElementsByTagName("head")[0];
+        //	 head.appendChild(link);
+        // }
+
+
+        // var $myDiv = document.getElementById("myDiv");
+
+        // var element = document.createElement("div");
+        // element.className = "message";
+        // var textNode = document.createTextNode("hello world");
+        // element.appendChild(textNode);
+        // var anotherTextNode = document.createTextNode("yippe");
+        // element.appendChild(anotherTextNode);
+        // document.body.appendChild(element);
+        // console.log("element.childNodes.length:" + element.childNodes.length);
+        // element.normalize();
+        // console.log("element.childNodes.length:" + element.childNodes.length);
+        // console.log("element.firstChild.nodeValue:" + element.firstChild.nodeValue);
+
+        // // $myDiv.firstChild.nodeValue = "Some <strong> other </strong> other message";
+        // var $myList = document.getElementById("myList");
+        // alert($myList.childNodes.length);  //13
+
+        // var div = document.createElement("div");
+        // div.id = "myNewDiv";
+        // div.className = "box";
+
+        // document.body.appendChild(div);
+
+        // function outputAttribute(element){
+        //	 var pairs = new Array(),
+        //		 attrName,
+        //		 attrValue,
+        //		 i,
+        //		 len;
+
+        //	 for(i = 0,len = element.attributes.length; i < len; i++){
+        //		 attrName = element.attributes[i].nodeName;
+        //		 attrValue = element.attributes[i].nodeValue;
+        //		 if(element.attributes[i].specified){
+        //			 pairs.push(attrName + "=\"" + attrValue + "\"");
+        //		 }
+        //	 }
+
+        //	 return pairs.join(",");
+        // }
+        // var $myDiv = document.getElementById("myDiv");
+        // // var id = $myDiv.attributes.getNamedItem("id").nodeValue;
+        // // alert(id);
+        // console.log("myDiv attributes:" + outputAttribute($myDiv));  // myDiv attributes:id="myDiv",class="bd",title="Body Text",lang="en",dir="ltr"
+
+        // console.log("id: " + $myDiv.getAttribute("id"));				 //myDiv
+        // console.log("className: " + $myDiv.getAttribute("class"));	//bd
+        // console.log("title: " + $myDiv.getAttribute("title"));			//Body Text
+        // console.log("lang: " + $myDiv.getAttribute("lang"));			//en
+        // console.log("dir: " + $myDiv.getAttribute("dir"));				//ltr
+
+        // console.log("id: " + $myDiv.id);				 //myDiv
+        // console.log("className: " + $myDiv.className);	//bd
+        // console.log("title: " + $myDiv.title);			//Body Text
+        // console.log("lang: " + $myDiv.lang);			//en
+        // console.log("dir: " + $myDiv.dir);				//ltr
+
+
+        // ------------------------------------------
+        // var $myDiv = document.getElementById("myDiv");
+        // console.log("tagName: " + $myDiv.tagName.toLowerCase());
+        // console.log("tagName: " + $myDiv.nodeName.toLowerCase());
+
+        // if($myDiv.tagName.toLowerCase == "div"){
+
+        // }
+        // window.onload = function() {
+        //	 document.write("Hello world");
+        // };
+
+        // document.write("<strong>"+(new Date()).toString()+"</strong>");
+
+        // document.write("<script type=\"text/javascript\" src=\"http://cdn.bootcss.com/jquery/3.0.0-rc1/jquery.js\"><\/script>");
+        // ----------------------------------
+        // var radios = document.getElementsByName("color");
+        // alert(radios.length);
+
+        // var anchors = document.anchors;
+        // var applets = document.applets;
+        // var forms = document.forms;
+        // var images = document.images;
+        // var links = document.links;
+
+        // console.log("anchors: "+ anchors.length);
+        // console.log("applets: "+ applets.length);
+        // console.log("forms: "+ forms.length);
+        // console.log("images: "+ images.length);
+        // console.log("links: "+ links.length);
+        // ---------------
+        // function convertToArray(nodes){
+        //	 var array = null;
+        //	 try {
+        //		 array = Array.prototype.slice(nodes,0);
+        //	 }catch (ex){
+        //		 array = new Array();
+        //		 for(var i = 0, len = nodes.length; i < len; i++){
+        //			 array.push(nodes[i]);
+        //		 }
+        //	 }
+        //	 return array;
+        // }
+
+        // var element = document.getElementById("myDiv"); //8
+
+
+        // var images = document.getElementsByTagName("img");
+        // var myImage = images["myImage"];
+    </script>
 </body>
+
 </html>
