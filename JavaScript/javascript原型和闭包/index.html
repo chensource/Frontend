@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <meta http-equiv="Access-Control-Allow-Origin" content="*"> -->
     <!-- 新 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="../../HTML/BootStrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="../../HTML/BootStrap/css/bootstrap-theme.min.css">
@@ -37,6 +38,16 @@
             border: 1px solid #ccc;
             float: left;
         }
+
+        #div1{
+            position: relative;
+            top: 50%;
+            left: 50%;
+            background-color: #000;
+            width:50%;
+            height: 50%;
+            -webkit-transform: translateX(-50%) translateY(-50%);
+        }
     </style>
 </head>
 
@@ -45,14 +56,24 @@
         <input type="text" name="username" size="10" pattern="\d+" maxLength="10" id="text-box1" placeHolder="text-indent" value="" required>
         <input type="text" name="userpassword" size="5" maxLength="10" id="text-box2" placeHolder="text-indent" value="">
         <textarea name="textarea-box" rows="8" id="text-box" cols="40">initial value</textarea>
-        <ul>
+        <ul id="myUl">
             <li>
                 <input type="radio" name="color" value="red">Red</li>
             <li>
                 <input type="radio" name="color" value="green">Green</li>
             <li>
                 <input type="radio" name="color" value="blue">Blue</li>
+            <li>
+                <input type="radio" name="color" value="blue">Blue</li>
+            <li>
+                <input type="radio" name="color" value="blue">Blue</li>
+             <li >
+                <input type="radio" name="color" value="blue">
+                Blue
+
+                </li>
         </ul>
+        <a href="###" id="aclick" index="0">email me</a>
         <!-- <input type="submit" id="submit-btn" name="submit-btn" value="提交"> -->
         <input type="button" id="btn-submit" name="name" value="按钮">
         <div style="margin:10px auto;">
@@ -65,73 +86,542 @@
             </select>
         </div>
     </form>
+
+ 
+ <!--    <div class="mediaplayer">
+	    <div class="video">
+		    <video id="player" src="http://centavedio.file.alimmdn.com/video/estatevideo/E7786882-D9F9-4B22-A9EB-1018A1EAAC86.mp4?t=1461223582861"
+		    width="300" height="200">
+		    Video player not available.
+		    </video>
+	    </div>
+	    <div class="controls">
+		    <input type="button" value="Play" id="video-btn">
+		    <span id="curtime">0</span>/<span id="duration">0</span>
+	    </div>
+    </div>
+    <div style="margin:20px auto; width:500px;" >
+    	  <canvas id="drawing" width="200" height="200">A drawing of something.....</canvas>
+    </div> -->
+    
+        <div id="status"  style="width:300px;height:300px;background-color:grey;">
+                 
+                <div id="div1" style="width:80px;height:80px;background-color:#D0CEEE;">
+                   <p style="margin-left:30px;padding-top:30px;font-size:16px"><b>我</b></p>
+                </div>
+        <div>
+
     <script src="../../HTML/BootStrap/js/jquery-2.1.4.min.js"></script>
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="../../HTML/BootStrap/js/bootstrap.min.js"></script>
     <script type="text/javascript">
+        function updateProgress(){
+            var div = document.getElementById("status");
+                div.style.width = (parseInt(div.style.width, 10) + 5) + "%";
+                if (div.style.left != "100%"){
+                mozRequestAnimationFrame(updateProgress);
+            }
+        }
 
-        var $form = document.forms[0];
-        // console.log(serialize($form));
-        var $btnsubmit = $form.elements["btn-submit"];
-        EventUtil.addHandler($btnsubmit,"click",function(){
-            console.log(serialize($form));
-        })
+        mozRequestAnimationFrame(updateProgress);
+
+        var CookieUtil = {
+            get: function(name) {
+                var cookieName = encodeURIComponent(name) + "=",
+                    cookieStart = document.cookie.indexOf(cookieName),
+                    cookieValue = null;
+                if (cookieStart > -1) {
+                    var cookieEnd = document.cookie.indexOf(";", cookieStart);
+                    if (cookieEnd == -1) {
+                        cookieEnd = document.cookie.length; 
+                    }
+                    cookieValue = decodeURIComponent(document.cookie.substring(cookieStart + 
+                        cookieName.length, cookieEnd));
+                }
+
+                return cookieValue;
+            },
+            set: function(name, value, expirses, path, domain, secure) {
+                var cookieText = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+                if (expirses instanceof Date) {
+                    cookieText += "; expirses=" + expirses.toGMTString();
+                }
+
+                if (path) {
+                    cookieText += ";path=" + path;
+                }
+
+                if (domain) {
+                    cookieText += ";domain=" + domain;
+                }
+
+                if (secure) {
+                    cookieText += ";secure";
+                }
+                document.cookie = cookieText;
+            },
+            unset: function(name, path, domain, secure) {
+                this.set(name, "", new Date(0), path, domain, secure);
+            }
+        };
+
+        var SubCookieUtil = {
+            get: function(name, subName) {
+                var subCookies = this.getAll(name);
+                if (subCookies) {
+                    return subCookies[subName];
+                } else {
+                    return null;
+                }
+            },
+            getAll: function(name) {
+                var cookieName = encodeURIComponent(name) + "=",
+                    cookieStart = document.cookie.indexOf(cookieName),
+                    cookieValue = null,
+                    cookieEnd,
+                    subCookies,
+                    i,
+                    len,
+                    parts,
+                    result = {};
+                if (cookieStart > -1) {
+                    cookieEnd = document.cookie.indexOf(";", cookStart);
+                    if (cookieEnd == -1) {
+                        cookieEnd = document.cookie.length;
+                    }
+                    cookieValue = document.cookie.substring(cookStart + cookieName.length, cookieEnd);
+                }
+
+                if (cookieValue.length > 0) {
+                    subCookies = cookieValue.split("&");
+                    for (i = 0, len = subCookies.length; i < len; i++) {
+                        parts = subCookies[i].split("&");
+                        result[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
+                    }
+                    return result;
+                }
+                return null;
+            },
+            set: function(name, subName, value, expirses, path, domain, secure) {
+                var subCookies = this.getAll(name) || {};
+                subCookies[subName] = value;
+                this.setAll(name,subcookies,expires,path,domain,secure);
+            },
+            setAll: function(name, subcookies, expirses, path, domain, secure) {
+                var cookieText = encodeURIComponent(name) + "=",
+                    subCookiesParts = new Array(),
+                    subName;
+
+                for (subName in subCookies) {
+                    if (subName.length > 0 && subCookies.hasOwnProperty(subName)) {
+                        subCookiesParts.push(encodeURIComponent(name) + "=" + encodeURIComponent(subCookies[subName]));
+                    }
+                }
+
+                if (subCookiesParts.length > 0) {
+                    cookieText += subcookieParts.join("&");
+                    if (expires instanceof Date) {
+                        cookieText += "; expires=" + expires.toGMTString();
+                    }
+                    if (path) {
+                        cookieText += "; path=" + path;
+                    }
+                    if (domain) {
+                        cookieText += "; domain=" + domain;
+                    }
+                    if (secure) {
+                        cookieText += "; secure";
+                    }
+                } else {
+                    cookieText += "; expires=" + (new Date(0)).toGMTString();
+                }
+            },
+            unset:function(name,subName,path,domain,secure){
+                var subcookies = this.getAll(name);
+                if(subcookies){
+                    delete subcookies[subName];
+                    this.setAll(name,subcookies,null,path,domain,secure);
+                }
+            },
+            unsetAll:function(name,path,domain,secure){
+                this.setAll(name,null,new Date(0),path,secure);
+            }
+        };
+
+        //设置Cookie
+        CookieUtil.set("name","Nicholas");
+
+        var indexedDB = window.indexedDB || window.msIndexedDB || window.mozIndexedDB || window.webkitIndexedDB;
+        // alert(indexedDB);
+        var request;
+        var database;
+        request = indexedDB.open("admin");
+        // alert(request);
+        request.onerror = function(event) {
+            alert("something bad happend while trying to open" + event.target.errorCode);
+        };
+        request.onsuccess = function(event) {
+            database = event.target.result;
+            console.log(database);
+            console.log(database.version);
+            if (database.version != "1.0") {
+                request = database.setVersion("1.0");
+                request.onerror = function(event) {
+                    alert("something bad happend while trying to set version" + event.target.errorCode);
+                };
+
+                request.onsuccess = function(event) {
+                    alert("Database initialization complete. Database name: " + database.name + ", Version: " + database.version);
+                };
+            } else {
+                alert("Database already initialized. Database name: " + database.name + ", Version: " + database.version);
+            };
+        };  
+
+        var user = {
+            username: "007",
+            firstName: "James",
+            lastName: "Bond",
+            password: "foo"
+        };
+
+
+
+        
+        
+        // document.cookie = "name=chenshi2";
+        // alert(navigator.onLine);
+        /*
+         * @array:要处理的项目的数组
+         * @process : 用于处理项目的函数
+         * @context : 运行该函数的作用域
+         */
+        // function chunk(array, process, context) {
+        //     setTimeout(function() {
+        //         var item = array.shift();
+        //         process.call(context, item);
+
+        //         if (array.length > 0) {
+        //             setTimeout(arguments.callee, 100);
+        //         }
+        //     }, 100);
+        // }
+
+        // var data = [13,123,1234,12345,12334,555,666,5555555,77,777,888,888,9999,123123,123123123,123131,23231,123123123,1231232];
+        // function printValue(item){
+        //     var div = document.getElementById("status")
+        //     div.innerHTML += item +　"<br />";
+        // }
+
+        // chunk(data.concat(),printValue);
+       //  function isArray(value){
+       //      return Object.prototype.toString.call(value) == "[object Array]";  
+       //  }
+
+       //  var array = new Array();
+       // alert(Object.prototype.toString.call(array));  
+
+        // var socket = new WebSocket("ws://www.example.com/server.php");
+        // socket.onerror = function(){
+        //     alert("Connection Error");
+        // }
+        // socket.onmessage = function(event){
+        //     var data = event.code;
+        //     alert(data);
+        // }
+        // socket.send("hello world");
+
+       
+
+        // socket.onerror = function(){
+        //     alert("Connection Error");
+        // }
+        // function createXHR() {
+        //     if (typeof XMLHttpRequest != "undefined") {
+        //         return new XMLHttpRequest();
+        //     }
+        // }
+        // var xhr = createXHR();
+        // Still in CONNECTING state.
+        // function addURLParam(url, name, value) {
+        //     url += (url.indexOf("?") == -1 ? "?" : "&");
+        //     url += encodeURIComponent(name) + "=" + encodeURIComponent(value);
+        //     return url;
+        // }
+
+        // var url = "http://apiv3refactor.centanet.com/json/reply/GetEstateRequest";
+        // url = addURLParam(url, "EstateCode", "peppwewxae");
+        // if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+        //     alert(xhr.responseText);
+        // } else {
+        //     alert("Request was unsuccessful:" + xhr.status);
+        // }
+        // xhr.open("get", url, false);
+        // xhr.send(null);
+        // function handleResponse(response){
+        //     alert("You're at ip address " + response.ip + ", which is in " + response.city + ", " + response.region_name);
+        // }
+        // var script = document.createElement("script");
+        // script.src = "http://freegeoip.net/json/?callback=handleResponse";
+        // document.body.insertBefore(script, document.body.firstChild);
+        // var img = new Image();
+        // img.onload = img.onerror = function(){
+        //     alert("Done.");
+        // }
+        // img.src = "http://baidu.com";
+       
+
+        // function createCORSRequest(method, url) {
+        //     var xhr = new XMLHttpRequest();
+        //     if ("withCredentials" in xhr) {
+        //         xhr.open(method, url, true);
+        //     } else if (typeof XDomainRequest != "undefined") {
+        //         vxhr = new XDomainRequest();
+        //         vxhr.open(method, url);
+        //     } else {
+        //         xhr = null;
+        //     }
+        //     return xhr;
+        // }
+
+        // var request = createCORSRequest("get", "http://www.baidu.com");
+        // alert(request);
+        // if (request) {
+        //     request.onload = function() {
+        //         alert(request.responseText);
+        //     }
+        //     request.send();
+        // }
+        // var xhr = createXHR();
+        // xhr.open("get", "jsonData.json", false);
+        // xhr.setRequestHeader("MyHeader", "MyValue");
+        // xhr.send(null);
+        // if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+        //     alert(xhr.responseText);
+        // } else {
+        //     alert("Request was unsuccessful:" + xhr.status);
+        // }
+       
+        // var myHeader =  xhr.getResponseHeader("MyHeader");
+        // var allHeaders = xhr.getAllResponseHeaders();
+        // console.log(allHeaders);
+
+
+        // var xhr = createXHR();
+        // xhr.onload = function(event) {
+        //     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+        //         alert(xhr.responseText);
+        //     } else {
+        //         alert("Request was unsuccessful:" + xhr.status);
+        //     }
+        // }
+        // xhr.onprogress = function(event){
+        //     var divStatus = document.getElementById("status");
+        //     if(event.lengthComputable){
+        //         divStatus.innerHTML = "Received " +　event.position +　" of " + event.totalSize + " bytes ";
+        //     }
+        // }
+        // xhr.open("get", "http://apiv3refactor.centanet.com/json/reply/GetEstateRequest?EstateCode=peppwewxae", true);
+        // xhr.send(null);
+
+        // var xdr = new XDomainRequest();
+        // xdr.onload = function(){
+        //     alert(xdr.responseText);
+        // }
+
+        // xdr.open("get","http://10.4.18.82/core/022/json/reply/GetGScopeStatisticsRequest?GscopeLevel=2&ParentId=2278");
+        // xdr.send(null);
+
+        //   	var book =	{
+		// 				"title": "Professional JavaScript",
+		// 				"authors": [
+		// 				"Nicholas C. Zakas"
+		// 				],
+		// 				edition: 3,
+		// 				year: 2011,
+		// 				toJSON: function(){
+		// 					return this.title;
+		// 				}
+		// 			};
+
+		// var jsonText = JSON.stringify(book);
+		// console.log(jsonText);  
+		// {
+		//     "title": "Professional JavaScript",
+		//     "authors": [
+		//         "Nicholas C. Zakas"
+		//     ],
+		//     "edition": 3,
+		//     "year": 2011
+		// }
+
+		// var josnText = JSON.stringify(book,["title","edition"]); //{"title":"Professional JavaScript","edition":3} 
+		// var jsonText = JSON.stringify(book,function(key,value){
+		// 	switch(key){
+		// 		case "authors":
+		// 			return value.join(",");
+		// 		case "year":
+		// 			return 5000;
+		// 		case "edition":
+		// 			return undefined;
+		// 		default:
+		// 			return value; 
+		// 	}
+		// });
+
+
+
+		// {"title":"Professional JavaScript","authors":"Nicholas C. Zakas","year":5000}
+    	// function process(values){
+    	// 	if(!(values instanceof Array)){
+    	// 		throw new Error("process() : Argument must be Array");
+    	// 	}
+    	// 	values.sort();
+    	// 	for (var i = 0 , len = values.length; i < len; i++) {
+    	// 		if(values[i] > 100){
+    	// 			return values[i];
+    	// 		}
+    	// 	}
+    	// 	return -1;
+    	// }
+    	
+    	// process(1);
+
+    	// window.onerror = function(message,url,line){
+    	// 	alert(message);
+    	// }
+    	// try {
+    	// 	window.someNonexistentFunction();
+    	// } catch (error){
+    	// 	alert(error.message);
+    	// }
+    	// var palyer = document.getElementById("player"),
+    	// 	btn = document.getElementById("video-btn"),
+    	// 	curtime = document.getElementById("curtime"),
+    	// 	duration = document.getElementById("duration");
+
+    	// duration.innerHTML = player.duration;
+
+    	// EventUtil.addHandler(btn,"click",function(event){
+    	// 	if(player.paused){
+    	// 		palyer.play();
+    	// 		btn.value = "Pause";
+    	// 	}else{
+    	// 		palyer.pause();
+    	// 		btn.value = "Play";
+    	// 	}
+    	// });
+
+    	// setInterval(function(){
+    	// 	curtime.innerHTML = player.currentTime;
+    	// },1000);
+
+    	// var drawing = document.getElementById("drawing");
+    	// //判断是否存在 getContext属性
+    	// if(drawing.getContext){
+    		// var context = drawing.getContext("2d");
+    		// // context.beginPath();
+    		// context.drawImage(image, 0, 10, 50, 50, 0, 100, 40, 60);
+    		// context.arc(100,100,99,99,0,2 * Math.PI , false);
+
+    		// context.moveTo(194,100);
+    		// context.arc(100,100,94,94,0,2 * Math.PI , false);
+
+    		//变换原点
+    		// context.translate(100,100);
+    		//旋转表针
+    		// context.rotate(1);
+
+    		// context.moveTo(0,0);
+    		// context.lineTo(0,-85);
+
+    		//绘制时针
+    		// context.moveTo(0, 0);
+    		// context.lineTo(-65, 0);
+
+    		// context.moveTo(100,100);
+    		// context.lineTo(100,15);
+
+    		// context.moveTo(100,100);
+    		// context.lineTo(35,100);
+    		//描边路径
+    		 // context.stroke();
+
+    		// context.font = "bold 14px Arial";
+    		// context.textAlign = "center";
+    		// context.textBaseline = "center";
+    		// context.fillText("12",100,20);
+
+    		// context.fillStyle = "#ff0000";
+    		// context.fillRect(10,10,50,50);
+    		// context.fillStyle = "rgba(0,0,255,0.5)";
+    		// context.fillRect(30,30,50,50);
+
+    		// context.clearRect(40,40,10,10);
+    	// }
+        // var $form = document.forms[0];
+        // // console.log(serialize($form));
+        // var $btnsubmit = $form.elements["btn-submit"];
+        // EventUtil.addHandler($btnsubmit,"click",function(){
+        //     console.log(serialize($form));
+        // })
         // var selectindex = $selectbox.selectedIndex;
         // var $selectOption = $selectbox.options[selectindex];
         // var $text = $selectOption.text;
         // var $value = $selectOption.value;
         // alert($text);
 
-        function serialize(form) {
-            var parts = [],
-                field = null,
-                i,
-                len,
-                j,
-                optLen,
-                option,
-                optValue;
-            for (i = 0, len = form.elements.length; i < len; i++) {
-                field = form.elements[i];
-                switch (field.type) {
-                    case "select-one":
-                    case "select-multiple":
-                        if (field.name.length) {
-                            for (j = 0, optLen = field.options.length; j < optLen; j++) {
-                                option = field.options[j];
-                                if (option.selected) {
-                                    optValue = "";
-                                    if (option.hasAttribute) {
-                                        optValue = (option.hasAttribute("value") ? option.value : option.text);
-                                    } else {
-                                        optValue = (option.attributes["value"].specified ? option.value : option.text);
-                                    }
-                                    parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(optValue));
-                                }
-                            }
-                        }
-                        break;
-                    case undefined: //自段集
-                    case "file": //文件输入
-                    case "submit": //提交按钮
-                    case "reset": //重置按钮
-                    case "button": //自定义按钮
-                        break;
-                    case "radio":
-                    case "checkbox":
-                        if (!field.checked) {
-                            break;
-                        }
-                        /* 执行默认操作 */
-                    default:
-                        //不包含没有名字的表单字段
-                        if (field.name.length) {
-                            parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
-                        }
-                }
-            }
-            return parts.join("&");
-        }
+        // function serialize(form) {
+        //     var parts = [],
+        //         field = null,
+        //         i,
+        //         len,
+        //         j,
+        //         optLen,
+        //         option,
+        //         optValue;
+        //     for (i = 0, len = form.elements.length; i < len; i++) {
+        //         field = form.elements[i];
+        //         switch (field.type) {
+        //             case "select-one":
+        //             case "select-multiple":
+        //                 if (field.name.length) {
+        //                     for (j = 0, optLen = field.options.length; j < optLen; j++) {
+        //                         option = field.options[j];
+        //                         if (option.selected) {
+        //                             optValue = "";
+        //                             if (option.hasAttribute) {
+        //                                 optValue = (option.hasAttribute("value") ? option.value : option.text);
+        //                             } else {
+        //                                 optValue = (option.attributes["value"].specified ? option.value : option.text);
+        //                             }
+        //                             parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(optValue));
+        //                         }
+        //                     }
+        //                 }
+        //                 break;
+        //             case undefined: //自段集
+        //             case "file": //文件输入
+        //             case "submit": //提交按钮
+        //             case "reset": //重置按钮
+        //             case "button": //自定义按钮
+        //                 break;
+        //             case "radio":
+        //             case "checkbox":
+        //                 if (!field.checked) {
+        //                     break;
+        //                 }
+        //                 /* 执行默认操作 */
+        //             default:
+        //                 //不包含没有名字的表单字段
+        //                 if (field.name.length) {
+        //                     parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
+        //                 }
+        //         }
+        //     }
+        //     return parts.join("&");
+        // }
 
         // alert($text);
         // var isPatternSupported = "pattern" in document.createElement("input");
