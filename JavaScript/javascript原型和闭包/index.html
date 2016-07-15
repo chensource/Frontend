@@ -115,15 +115,15 @@
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="../../HTML/BootStrap/js/bootstrap.min.js"></script>
     <script type="text/javascript">
-        function updateProgress(){
-            var div = document.getElementById("status");
-                div.style.width = (parseInt(div.style.width, 10) + 5) + "%";
-                if (div.style.left != "100%"){
-                mozRequestAnimationFrame(updateProgress);
-            }
-        }
+        // function updateProgress(){
+        //     var div = document.getElementById("status");
+        //         div.style.width = (parseInt(div.style.width, 10) + 5) + "%";
+        //         if (div.style.left != "100%"){
+        //         mozRequestAnimationFrame(updateProgress);
+        //     }
+        // }
 
-        mozRequestAnimationFrame(updateProgress);
+        // mozRequestAnimationFrame(updateProgress);
 
         var CookieUtil = {
             get: function(name) {
@@ -287,7 +287,42 @@
         };
 
 
+      
 
+        function b(){
+        	console.log("Test2");
+        }
+
+        var processor = {
+	        	timeoutId: null,
+	        	//实际进行处理的方法
+		        performProcessing: function(){
+		        //实际执行的代码
+		        },
+	        	//初始处理调用的方法
+		        process: function(){
+		        	clearTimeout(this.timeoutId);
+			        var that = this;
+			        this.timeoutId = setTimeout(function(){
+			        	that.performProcessing();
+		        }, 100);
+	        }
+        };
+
+        function a(){
+        	console.log("Success");
+        }
+
+        function throttle(method, context) {
+			clearInterval(method.tId);
+			method.tId= setInterval(function(){
+				method.call(context);
+			}, 1000);
+		}
+
+
+
+		throttle(a,this);
         
         
         // document.cookie = "name=chenshi2";
@@ -315,9 +350,9 @@
         // }
 
         // chunk(data.concat(),printValue);
-       //  function isArray(value){
-       //      return Object.prototype.toString.call(value) == "[object Array]";  
-       //  }
+        // function isArray(value){
+        //     return Object.prototype.toString.call(value) == "[object Array]";  
+        // }
 
        //  var array = new Array();
        // alert(Object.prototype.toString.call(array));  
