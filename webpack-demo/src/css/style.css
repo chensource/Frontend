@@ -1,0 +1,13 @@
+@font-face {
+  font-family: 'MyFont';
+  src: url('./fonts/Droid Sans Mono.ttf') format('ttf');
+  font-weight: 600;
+  font-style: normal;
+}
+
+.hello {
+  color: red;
+  font-family: "MyFont";
+  font-size: 24px;
+  background: url('../images/icon.png');
+}

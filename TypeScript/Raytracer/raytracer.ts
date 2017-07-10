@@ -36,7 +36,7 @@ class Color {
     static background = Color.black;
     static defaultColor = Color.black;
     static toDrawingColor(c: Color) {
-        var legalize = d=> d > 1 ? 1 : d;
+        var legalize = d => d > 1 ? 1 : d;
         return {
             r: Math.floor(legalize(c.r) * 255),
             g: Math.floor(legalize(c.g) * 255),
@@ -123,10 +123,10 @@ class Plane implements Thing {
     public normal: (pos: Vector) => Vector;
     public intersect: (ray: Ray) => Intersection;
     constructor(norm: Vector, offset: number, public surface: Surface) {
-        this.normal = function(pos: Vector) {
+        this.normal = function (pos: Vector) {
             return norm;
         }
-        this.intersect = function(ray: Ray): Intersection {
+        this.intersect = function (ray: Ray): Intersection {
             var denom = Vector.dot(norm, ray.dir);
             if (denom > 0) {
                 return null;
@@ -140,23 +140,23 @@ class Plane implements Thing {
 
 module Surfaces {
     export var shiny: Surface = {
-        diffuse: function(pos) { return Color.white; },
-        specular: function(pos) { return Color.grey; },
-        reflect: function(pos) { return 0.7; },
+        diffuse: function (pos) { return Color.white; },
+        specular: function (pos) { return Color.grey; },
+        reflect: function (pos) { return 0.7; },
         roughness: 250
     }
     export var checkedborad: Surface = {
-        diffuse: function(pos) {
+        diffuse: function (pos) {
             if ((Math.floor(pos.z) + Math.floor(pos.x)) % 2 !== 0) {
                 return Color.white;
             } else {
                 return Color.black;
             }
         },
-        specular: function(pos) {
+        specular: function (pos) {
             return Color.white;
         },
-        reflect: function(pos) {
+        reflect: function (pos) {
             if ((Math.floor(pos.z) + Math.floor(pos.x)) % 2 !== 0) {
                 return 0.1;
             } else {
@@ -227,10 +227,10 @@ class RayTracer {
             } else {
                 var illum = Vector.dot(livec, norm);
                 var lcolor = (illum > 0) ? Color.scale(illum, light.color)
-                : Color.defaultColor;
+                    : Color.defaultColor;
                 var specular = Vector.dot(livec, Vector.norm(rd));
                 var scolor = (specular > 0) ? Color.scale(Math.pow(specular, thing.surface.roughness), light.color)
-                : Color.defaultColor;
+                    : Color.defaultColor;
                 return Color.plus(col, Color.plus(Color.times(thing.surface.diffuse(pos), lcolor),
                     Color.times(thing.surface.specular(pos), scolor)));
             }
@@ -240,8 +240,8 @@ class RayTracer {
 
     render(scene, ctx, screenWidth, screenHeight) {
         var getPoint = (x, y, camera) => {
-            var recenterX = x=> (x - (screenWidth / 2.0)) / 2.0 / screenWidth;
-            var recenterY = y=> -(y - (screenHeight / 2.0)) / 2.0 / screenHeight;
+            var recenterX = x => (x - (screenWidth / 2.0)) / 2.0 / screenWidth;
+            var recenterY = y => -(y - (screenHeight / 2.0)) / 2.0 / screenHeight;
             return Vector.norm(Vector.plus(camera.forward, Vector.plus(Vector.times(recenterX(x), camera.right), Vector.times(recenterY(y), camera.up))))
         }
         for (var y = 0; y < screenHeight; y++) {
