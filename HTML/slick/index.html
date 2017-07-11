@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="http://cdn.bootcss.com/slick-carousel/1.6.0/slick.css"/>
+	<!-- Add the slick-theme.css if you want default styling -->
+	<!-- <link rel="stylesheet" type="text/css" href="http://cdn.bootcss.com/slick-carousel/1.6.0/slick-theme.css"/>
+	-->
+	<link rel="stylesheet" type="text/css" href="styles/slick-theme.css"/>
+	<link rel="stylesheet" type="text/css" href="styles/style.css"/>
+</head>
+<body class="blue">
+	<div class="slider center">
+		<div>
+			<h3>1</h3>
+		</div>
+		<div>
+			<h3>2</h3>
+		</div>
+		<div>
+			<h3>3</h3>
+		</div>
+		<div>
+			<h3>4</h3>
+		</div>
+		<div>
+			<h3>5</h3>
+		</div>
+		<div>
+			<h3>6</h3>
+		</div>
+	</div>
+	<!-- <div class="slider autoplay">
+	<div>
+		<h3>1</h3>
+	</div>
+	<div>
+		<h3>2</h3>
+	</div>
+	<div>
+		<h3>3</h3>
+	</div>
+	<div>
+		<h3>4</h3>
+	</div>
+	<div>
+		<h3>5</h3>
+	</div>
+	<div>
+		<h3>6</h3>
+	</div>
+</div>
+-->
+<script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.js"></script>
+<script type="text/javascript" src="http://cdn.bootcss.com/slick-carousel/1.6.0/slick.min.js"></script>
+<script>
+$(function(){
+	init2();
+});
+function init2(){
+
+    $.ajax({
+        async:false,
+        url: 'http://datainfo.duapp.com/shopdata/userinfo.php',  // 跨域URL
+        type: 'GET',
+        dataType: 'jsonp',
+        jsonp: 'jsoncallback', //默认callback
+        data: 'id=10', //请求数据
+      	timeout: 5000,
+        beforeSend: function(){
+            //jsonp 方式此方法不被触发。原因可能是dataType如果指定为jsonp的话，就已经不是ajax事件了
+        },
+        success: function(json) {
+            //客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+            alert(json.respond.title);
+
+            if(json.actionErrors.length!==0)
+            {
+                alert(json.actionErrors);
+        }
+
+    }
+
+});
+
+};
+
+		// $('.autoplay').slick({
+		// 	  slidesToShow: 3,
+		// 	  slidesToScroll: 1,
+		// 	  autoplay: true,
+		// 	  autoplaySpeed: 2000,
+		// });
+
+	</script>
+</body>
+</html>

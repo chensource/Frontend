@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Calc</title>
+</head>
+<body>
+	<input type="text" id="input1">
+	<button type="button" onclick="kick(this.value)" value="1">1</button>
+	<button type="button" onclick="kick(this.value)" value="2">2</button>
+	<button type="button" onclick="kick(this.value)" value="3">3</button>
+	<button type="button" onclick="kick(this.value)" value="4">4</button>
+	<button type="button" onclick="kick(this.value)" value="5">5</button>
+	<button type="button" onclick="kick(this.value)" value="6">6</button>
+	<button type="button" onclick="kick(this.value)" value="7">7</button>
+	<button type="button" onclick="kick(this.value)" value="8">8</button>
+	<button type="button" onclick="kick(this.value)" value="9">9</button>
+	<button type="button" onclick="kick(this.value)" value="+">+</button>
+	<button type="button" onclick="kick(this.value)" value="-">-</button>
+	<button type="button" onclick="kick(this.value)" value="*">*</button>
+	<button type="button" onclick="kick(this.value)" value="/">/</button>
+	<button type="button" onclick="kick(this.value)" value="C">C</button>
+	<button type="button" onclick="kick(this.value)" value="=">=</button>
+
+	<script>
+	var input  = document.getElementById("#input1");
+	var opt = "";//预存操作符
+    var sNum = "";//预存第一个数字
+    var isAppend = true;//是否要追加数字
+    function kick(btn) {
+        switch (btn) {
+            case  "=":
+                oInput.value = cal(sNum, oInput.value, opt);
+                break;
+            case  "+":
+            case  "-":
+            case  "*":
+            case  "/":
+                oInput.value = cal(sNum, oInput.value, opt);
+                opt = btn; //"+"
+                isAppend = false;
+                sNum = oInput.value; //"78"
+                break;
+            case  "C":
+                opt = "";
+                sNum = "";
+                oInput.value = "0";
+                break;
+            default:
+                oInput.value = oInput.value == "0" ? "" : oInput.value;
+                if (opt == "" || isAppend) {
+                    oInput.value += btn;
+                } else {
+                    oInput.value = btn;
+                    isAppend = true;
+                }
+        	}
+    	}
+
+	    /*
+	     * num1:
+	     * bum2:
+	     * opt:
+	     */
+	    function cal(num1, num2, opt) {
+	        switch (opt) {
+	            case "+":
+	                return Number(num1) + Number(num2);
+	                break;
+	            case "-":
+	                return Number(num1) - Number(num2);
+	            case "*":
+	                return Number(num1) * Number(num2);
+	            case "/":
+	                return Number(num1) / Number(num2);
+	            default:
+	                return Number(oInput.value);
+	        }
+	    }
+	</script>
+</body>
+</html>
