@@ -2,6 +2,7 @@ var path = require('path');
 //一个常见的Webpack配置文件
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
     devtool: "eval-source-map",
@@ -28,7 +29,8 @@ module.exports = {
                 'style-loader', {
                     loader: 'css-loader',
                     options: {
-                        modules: true // 设置css模块化,详情参考https://github.com/css-modules/css-modules
+                        modules: true, // 设置css模块化,详情参考https://github.com/css-modules/css-modules
+                        minimize: true
                     }
                 }, {
                     loader: 'postcss-loader',
@@ -40,11 +42,14 @@ module.exports = {
                             ];
                         }
                     }
+                }, {
+                    loader: ExtractTextPlugin.extract("style-loader", "css-loader")
                 }
             ]
         }]
     },
     plugins: [
+        new ExtractTextPlugin("css/[name].css"),
         new webpack.LoaderOptionsPlugin({
             options: {
                 devServer: {
