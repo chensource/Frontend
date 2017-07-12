@@ -5,15 +5,15 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
-    devtool: "eval-source-map",
+    devtool: "cheap-module-eval-source-map",
     entry: {
         main: __dirname + "/app/main.js", //唯一入口文件
         vendor: ['moment']
     },
     output: {
-        path: __dirname + '/public', // 打包后的文件存放的地方
-        filename: "[name].[hash].js", //打包以后输出的文件名
-        chunkFilename: "[name].[hash].js"
+        path: path.join(__dirname, "build"), // 打包后的文件存放的地方
+        filename: "[name].entry.js", //打包以后输出的文件名
+        chunkFilename: "[name].[hash:8].js"
     },
     module: {
         rules: [{
@@ -25,31 +25,50 @@ module.exports = {
         }, {
             test: /\.css$/,
             // loader: "style-loader"
-            use: [
-                'style-loader', {
+            use: ExtractTextPlugin.extract({
+                fallback: "style-loader",
+                use: [{
                     loader: 'css-loader',
                     options: {
-                        modules: true, // 设置css模块化,详情参考https://github.com/css-modules/css-modules
                         minimize: true
                     }
-                }, {
-                    loader: 'postcss-loader',
-                    // 在这里进行配置，也可以在postcss.config.js中进行配置，详情参考https://github.com/postcss/postcss-loader
-                    options: {
-                        plugins: function() {
-                            return [
-                                require('autoprefixer')
-                            ];
-                        }
-                    }
-                }, {
-                    loader: ExtractTextPlugin.extract("style-loader", "css-loader")
+                }]
+            })
+        }, {
+            test: /\.((woff2?|svg)(\?v=[0-9]\.[0-9]\.[0-9]))|(woff2?|svg|jpe?g|png|gif|ico)$/,
+            use: [{
+                loader: 'url-loader',
+                query: {
+                    // 小于10KB的图片会自动转成dataUrl
+                    limit: '10240',
+                    name: 'img/[hash:8].[name].[ext]'
                 }
-            ]
+            }, {
+                loader: 'image-webpack-loader',
+                query: {
+                    bypassOnDebug: true,
+                    progressive: true,
+                    optimizationLevel: 3,
+                    interlaced: false,
+                    pngquant: {
+                        quality: '65-80',
+                        speed: 4
+                    }
+                }
+            }]
+        }, {
+            test: /\.((ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9]))|(ttf|eot)$/,
+            use: [{
+                loader: 'url-loader',
+                query: {
+                    limit: '10000',
+                    name: 'fonts/[hash:8].[name].[ext]'
+                }
+            }]
         }]
     },
     plugins: [
-        new ExtractTextPlugin("css/[name].css"),
+        new ExtractTextPlugin("[name]-[hash:5].min.css"),
         new webpack.LoaderOptionsPlugin({
             options: {
                 devServer: {
@@ -60,20 +79,22 @@ module.exports = {
                 }
             }
         }),
+        //压缩混淆js
         new webpack.optimize.UglifyJsPlugin({
             compressor: {
                 warnings: false,
             }
         }),
         //通过计算模块出现次数来分配模块。这个经常被使用可以较快地获得模块。这使得模块可以预读，建议这样可以减少总文件大小。
-        new webpack.optimize.OccurrenceOrderPlugin(),
+        new webpack.optimize.OccurrenceOrderPlugin(), //为组件分配ID
         new webpack.optimize.CommonsChunkPlugin({
             names: ["vendor", "manifest"] // vendor libs + extracted manifest
         }),
         new HtmlWebpackPlugin({
             template: __dirname + "/app/index.tmpl.html" //new 一个这个插件的实例，并传入相关的参数
         }),
-        new webpack.HotModuleReplacementPlugin() //热加载插件
-
+        new webpack.HotModuleReplacementPlugin(), //热加载插件
+        //跳过编译时出错的代码并记录
+        new webpack.NoErrorsPlugin()
     ]
 };
