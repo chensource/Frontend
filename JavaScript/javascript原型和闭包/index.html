@@ -86,7 +86,7 @@
             </select>
         </div>
     </form>
-
+    <input type="text" id="focus" value="13123213" />
  
  <!--    <div class="mediaplayer">
 	    <div class="video">
@@ -124,7 +124,9 @@
         // }
 
         // mozRequestAnimationFrame(updateProgress);
-
+        $(function(){
+           $("#focus").onfocus();     
+        });
         var CookieUtil = {
             get: function(name) {
                 var cookieName = encodeURIComponent(name) + "=",
