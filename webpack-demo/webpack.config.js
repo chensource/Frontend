@@ -15,6 +15,9 @@ module.exports = {
         filename: "[name].entry.js", //打包以后输出的文件名
         chunkFilename: "[name].[hash:8].js"
     },
+    resolve: { // resolve 指定可以被 import 的文件后缀
+        extensions: ['', '.js', '.jsx']
+    },
     module: {
         rules: [{
             test: /\.js$/,
@@ -91,7 +94,21 @@ module.exports = {
             names: ["vendor", "manifest"] // vendor libs + extracted manifest
         }),
         new HtmlWebpackPlugin({
-            template: __dirname + "/app/index.tmpl.html" //new 一个这个插件的实例，并传入相关的参数
+            template: __dirname + "/app/index.tmpl.html", //new 一个这个插件的实例，并传入相关的参数
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+                removeRedundantAttributes: true,
+                useShortDoctype: true,
+                removeEmptyAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                keepClosingSlash: true,
+                minifyJS: true,
+                minifyCSS: true,
+                minifyURLs: true,
+            },
+            inject: 'body',
+            filename: 'index.html'
         }),
         new webpack.HotModuleReplacementPlugin(), //热加载插件
         //跳过编译时出错的代码并记录
