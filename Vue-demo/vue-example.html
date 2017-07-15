@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue.js Example</title>
+</head>
+
+<body>
+    <div id="example"></div>
+    <div id="app1">
+        <span v-once>This will Never Change:{{msg | capitalize | uppercase}}</span>
+        <div v-html="rawHtml"></div>
+        <div v-bind:id="dynamicId"></div>
+        <button v-bind:disabled="isButtonDisabled">button</button>
+    </div>
+    <script src="https://unpkg.com/vue"></script>
+    <script>
+        var data = {
+            a: 1
+        }
+        var vm = new Vue({
+            data: data,
+            created: function() {
+                console.log('a is ' + this.a);
+            }
+        });
+
+        vm.$data === data;
+        console.log(vm.a === data.a);
+        vm.a = 2;
+        console.log(data.a);
+
+        vm.$watch('a', function(newVal, oldVal) {
+            console.log(newVal, oldVal);
+        })
+
+        var vm1 = new Vue({
+            el: "#app1",
+            data: {
+                msg: 'once',
+                rawHtml: "<b>HTML</b>",
+                dynamicId: "id",
+                isButtonDisabled: false
+            },
+            filters: {
+                capitalize: function(value) {
+                    if (!value) return ""
+                    value = value.toString()
+                    return value.charAt(0).toUpperCase() + value.slice(1)
+                },
+                uppercase: function(value) {
+                    if (!value) return ""
+                    value = value.toString()
+                    return value.toUpperCase() + "_" + "Vue.js"
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
