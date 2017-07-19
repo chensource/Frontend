@@ -31,7 +31,6 @@ var vm = new Vue({
         addbook: function() {
             this.book.id = this.books.length + 1
             this.books.push(this.book)
-            this.book = ""
         },
         delbook: function(book) {
             var index = this.books.indexOf(book)
