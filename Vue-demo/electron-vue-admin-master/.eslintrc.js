@@ -2,10 +2,7 @@ module.exports = {
     root: true,
     parser: 'babel-eslint',
     parserOptions: {
-        "ecmaFeatures": {
-            "jsx": true,
-            "modules": true
-        }
+        sourceType: 'module'
     },
     env: {
         browser: true,
@@ -16,14 +13,6 @@ module.exports = {
     plugins: [
         'html'
     ],
-    // check if imports actually resolve
-    'settings': {
-        'import/resolver': {
-            'webpack': {
-                'config': 'build/webpack.base.conf.js'
-            }
-        }
-    },
     // add your custom rules here
     'rules': {
         // don't require .vue extension when importing
@@ -38,9 +27,7 @@ module.exports = {
          */
 
         // disallow unnecessary parentheses
-        'no-extra-parens': ['error', 'all', {
-            'nestedBinaryExpressions': false
-        }],
+        'no-extra-parens': ['error', 'all', {'nestedBinaryExpressions': false}],
 
         // disallow negating the left operand of relational operators
         'no-unsafe-negation': 'error',
@@ -164,9 +151,7 @@ module.exports = {
         'block-spacing': 'error',
 
         // enforce consistent brace style for blocks
-        'brace-style': ['error', '1tbs', {
-            'allowSingleLine': true
-        }],
+        'brace-style': ['error', '1tbs', {'allowSingleLine': true}],
 
         // require or disallow trailing commas
         'comma-dangle': 'error',
@@ -184,9 +169,7 @@ module.exports = {
         'func-call-spacing': 'error',
 
         // enforce consistent indentation
-        indent: ['error', 2, {
-            SwitchCase: 1
-        }],
+        indent: ['error', 2, {SwitchCase: 1}],
 
         // enforce the consistent use of either double or single quotes in JSX attributes
         'jsx-quotes': 'error',

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Component-Example</title>
+</head>
+
+<body>
+  <div id="app">
+    <input type="text" v-model="parentMsg">
+    <my-component :message="parentMsg"></my-component>
+  </div>
+  <hr>
+  <div id="app2">
+    <simple-counter></simple-counter>
+    <simple-counter></simple-counter>
+    <simple-counter></simple-counter>
+  </div>
+
+  <hr>
+  <h1>构成组件 父子组件的关系可以总结为 props down, events up 父组件通过 props 向下传递数据给子组件，子组件通过 events 给父组件发送消息。</h1>
+  <div id="app3">
+    <p>{{ total }}</p>
+    <button-counter v-on:increment="incrementTotal"></button-counter>
+    <button-counter v-on:increment="incrementTotal"></button-counter>
+  </div>
+  <script src="https://unpkg.com/vue"></script>
+  <script>
+    // 注册一个全局组件
+    // Vue.component('my-component', {
+    //   template: '<div>A custom component!</div>'
+    // })
+    //通过使用组件实例选项注册，可以使组件仅在另一个实例/组件的作用域中可用
+    var data = {
+      counter: 0
+    }
+
+    var child = {
+      props: ['message'],
+      template: '<div>{{ message }}</div>'
+    }
+
+
+    var simplecounter = {
+      template: '<button v-on:click="counter += 1">{{ counter }}</button>',
+      data: function() {
+        return {
+          counter: 0
+        }
+      }
+    }
+
+    var vm = new Vue({
+      el: "#app",
+      data: {
+        parentMsg: "hello"
+      },
+      components: {
+        "my-component": child
+      }
+    });
+
+    var vm = new Vue({
+      el: "#app2",
+      components: {
+        "simple-counter": simplecounter
+      }
+    });
+    // -------------------------------
+    var buttoncounter = {
+      template: '<button @click="increment">{{ counter  }}</button>',
+      data: function() {
+        return {
+          counter: 0
+        }
+      },
+
+      methods: {
+        increment: function() {
+          this.counter += 1
+          this.$emit('increment')
+        }
+      }
+    }
+
+    var vu3 = new Vue({
+      el: "#app3",
+      data: {
+        total: 0
+      },
+      components: {
+        "button-counter": buttoncounter
+      },
+      methods: {
+        incrementTotal: function() {
+          this.total += 1
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
