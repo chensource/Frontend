@@ -1,0 +1,13 @@
+{
+  "plugins": ["vue"],
+  "extends": ["elemefe"],
+  "rules": {
+    "semi": 0,
+    "eol-last": 0,
+    //字符串必须使用单引号
+    "quotes": [
+      "error",
+      "single"
+    ]
+  }
+}
