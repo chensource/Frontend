@@ -46,9 +46,7 @@ export default {
         password: ''
       },
       loginRules: {
-        password: [
-          { required: true, trigger: 'blur', validator: validatePass }
-        ]
+        password: [{ required: true, trigger: 'blur', validator: validatePass }]
       },
       loading: false,
       showDialog: false
