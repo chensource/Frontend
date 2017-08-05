@@ -14,7 +14,7 @@ const Login = _import('login/index');
 const dashboard = _import('dashboard/index');
 
 /* Introduction */
-// const Introduction = _import('introduction/index');
+const Introduction = _import('introduction/index');
 
 /* components */
 // const componentsIndex = _import('components/index');
@@ -52,14 +52,14 @@ const Err401 = _import('error/401');
 // const Theme = _import('theme/index');
 
 /* example */
-// const TableLayout = _import('example/table/index');
-// const DynamicTable = _import('example/table/dynamictable');
-// const Table = _import('example/table/table');
-// const DragTable = _import('example/table/dragTable');
-// const InlineEditTable = _import('example/table/inlineEditTable');
+const TableLayout = _import('example/table/index');
+const DynamicTable = _import('example/table/dynamictable');
+const Table = _import('example/table/table');
+const DragTable = _import('example/table/dragTable');
+const InlineEditTable = _import('example/table/inlineEditTable');
 
-// const Form = _import('example/form');
-// const Tab = _import('example/tab/index');
+const Form = _import('example/form');
+const Tab = _import('example/tab/index');
 
 /* permission */
 // const Permission = _import('permission/index');
@@ -79,8 +79,8 @@ export const constantRouterMap = [
   // { path: '/authredirect', component: authRedirect, hidden: true },
   { path: '/404', component: Err404, hidden: true },
   { path: '/401', component: Err401, hidden: true },
-  { path: '/', component: Layout, redirect: '/dashboard', name: '首页', hidden: true, children: [{ path: 'dashboard', component: dashboard }] }
-  // { path: '/introduction', component: Layout, redirect: '/introduction/index', icon: 'xinrenzhinan', noDropdown: true, children: [{ path: 'index', component: Introduction, name: '简述' }] }
+  { path: '/', component: Layout, redirect: '/dashboard', name: '首页', hidden: true, children: [{ path: 'dashboard', component: dashboard }] },
+  { path: '/introduction', component: Layout, redirect: '/introduction/index', icon: 'xinrenzhinan', noDropdown: true, children: [{ path: 'index', component: Introduction, name: '简述' }] }
 ]
 
 export default new Router({
@@ -92,6 +92,59 @@ export default new Router({
 });
 
 export const asyncRouterMap = [
+  { path: '*', redirect: '/404', hidden: true },
+  {
+    path: '/example',
+    component: Layout,
+    redirect: 'noredirect',
+    name: '综合实例',
+    icon: 'zonghe',
+    children: [{
+      path: '/example/table',
+      component: TableLayout,
+      redirect: '/example/table/table',
+      name: 'Table',
+      children: [{
+        path: 'dynamictable',
+        component: DynamicTable,
+        name: '动态table'
+      },
+      {
+        path: 'dragtable',
+        component: DragTable,
+        name: '拖拽table'
+      },
+      {
+        path: 'inline_edit_table',
+        component: InlineEditTable,
+        name: 'table内编辑'
+      },
+      {
+        path: 'table',
+        component: Table,
+        name: '综合table'
+      }
+      ]
+    },
+    {
+      path: 'form/edit',
+      component: Form,
+      name: '编辑Form',
+      meta: {
+        isEdit: true
+      }
+    },
+    {
+      path: 'form/create',
+      component: Form,
+      name: '创建Form'
+    },
 
-  { path: '*', redirect: '/404', hidden: true }
+    {
+      path: 'tab/index',
+      component: Tab,
+      name: 'Tab'
+    }
+    ]
+  }
 ];

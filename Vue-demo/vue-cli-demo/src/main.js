@@ -7,16 +7,22 @@ import store from './store';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-default/index.css';
 import 'normalize.css/normalize.css'; // normalize.css 样式格式化
+import 'assets/iconfont/iconfont'; // iconfont 具体图标见https://github.com/PanJiaChen/vue-element-admin/wiki
+import NProgress from 'nprogress'; // Progress 进度条
 import IconSvg from 'components/Icon-svg'; // svg 组件
+import Multiselect from 'vue-multiselect'; // 使用的一个多选框组件，element-ui的select不能满足所有需求
+import 'vue-multiselect/dist/vue-multiselect.min.css'; // 多选框组件css
+import Sticky from 'components/Sticky'; // 粘性header组件
+import vueWaves from './directive/waves'; // 水波纹指令
 import './mock/index.js'; // 该项目所有请求使用mockjs模拟
 
 // register globally
-// Vue.component('multiselect', Multiselect);
-// Vue.component('Sticky', Sticky);
+Vue.component('multiselect', Multiselect);
+Vue.component('Sticky', Sticky);
 import { getToken } from 'utils/auth';
 Vue.component('icon-svg', IconSvg);
 Vue.use(ElementUI);
-
+Vue.use(vueWaves);
 // Vue.config.productionTip = false
 
 // permissiom judge
@@ -29,7 +35,7 @@ Vue.use(ElementUI);
 
 const whiteList = ['/login', '/authredirect', '/reset', '/sendpwd']; // 不重定向白名单
 router.beforeEach((to, from, next) => {
-  // NProgress.start(); // 开启Progress
+  NProgress.start(); // 开启Progress
   if (getToken()) { // 判断是否有token
     if (to.path === '/login') {
       next({ path: '/' });
@@ -61,7 +67,7 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach(() => {
-  // NProgress.done(); // 结束Progress
+  NProgress.done(); // 结束Progress
 });
 
 Vue.config.productionTip = false;

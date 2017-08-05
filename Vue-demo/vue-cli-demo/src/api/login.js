@@ -23,8 +23,7 @@ export function getInfo(token) {
   return fetch({
     url: '/user/info',
     method: 'get',
-    params: {
-      token
-    }
+    params: { token }
   });
 }
+
