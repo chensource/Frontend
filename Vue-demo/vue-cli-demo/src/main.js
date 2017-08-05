@@ -1,22 +1,21 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue'
-import App from './App'
-import router from './router'
-import store from './store'
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
-import 'normalize.css/normalize.css' // normalize.css 样式格式化
+import Vue from 'vue';
+import App from './App';
+import router from './router';
+import store from './store';
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-default/index.css';
+import 'normalize.css/normalize.css'; // normalize.css 样式格式化
 import IconSvg from 'components/Icon-svg'; // svg 组件
-import {
-  getToken
-} from 'utils/auth';
+import './mock/index.js'; // 该项目所有请求使用mockjs模拟
 
 // register globally
 // Vue.component('multiselect', Multiselect);
 // Vue.component('Sticky', Sticky);
-Vue.component('icon-svg', IconSvg)
-Vue.use(ElementUI)
+import { getToken } from 'utils/auth';
+Vue.component('icon-svg', IconSvg);
+Vue.use(ElementUI);
 
 // Vue.config.productionTip = false
 
@@ -38,9 +37,9 @@ router.beforeEach((to, from, next) => {
       if (store.getters.roles.length === 0) { // 判断当前用户是否已拉取完user_info信息
         store.dispatch('GetInfo').then(res => { // 拉取user_info
           const roles = res.data.role;
-          store.dispatch('GenerateRoutes', { roles }).then(() => { // 生成可访问的路由表
-            router.addRoutes(store.getters.addRouters) // 动态添加可访问路由表
-            next({ ...to }); // hack方法 确保addRoutes已完成
+          store.dispatch('GenerateRoutes', { roles }).then(() => {
+            router.addRoutes(store.getters.addRouters);
+            next({ ...to });
           })
         }).catch(() => {
           store.dispatch('FedLogOut').then(() => {
@@ -48,9 +47,7 @@ router.beforeEach((to, from, next) => {
           })
         })
       } else {
-        // 没有动态改变权限的需求可直接next() 删除下方权限判断 ↓
-        next({ path: '/401', query: { noGoBack: true } });
-        // 可删 ↑
+        next();
       }
     }
   } else {

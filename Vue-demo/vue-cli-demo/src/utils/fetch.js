@@ -5,7 +5,7 @@ import { getToken } from 'utils/auth';
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: process.env.BASE_API, // api的base_url
+  baseURL: process.env.BASE_API, // 通过 env 环境变量切换 api 地址
   timeout: 5000 // 请求超时时间
 });
 

@@ -19,9 +19,7 @@ import IconSvg from 'components/Icon-svg'; // svg 组件
 import vueWaves from './directive/waves'; // 水波纹指令
 import errLog from 'store/errLog'; // error log组件
 import './mock/index.js'; // 该项目所有请求使用mockjs模拟
-import {
-  getToken
-} from 'utils/auth';
+import { getToken } from 'utils/auth';
 
 // register globally
 Vue.component('multiselect', Multiselect);
@@ -59,7 +57,8 @@ router.beforeEach((to, from, next) => {
             roles
           }).then(() => { // 生成可访问的路由表
             router.addRoutes(store.getters.addRouters) // 动态添加可访问路由表
-            next({ ...to
+            next({
+              ...to
             }); // hack方法 确保addRoutes已完成
           })
         }).catch(() => {
@@ -102,7 +101,7 @@ Vue.config.productionTip = false;
 
 // 生产环境错误日志
 if (process.env === 'production') {
-  Vue.config.errorHandler = function(err, vm) {
+  Vue.config.errorHandler = function (err, vm) {
     console.log(err, window.location.href);
     errLog.pushLog({
       err,

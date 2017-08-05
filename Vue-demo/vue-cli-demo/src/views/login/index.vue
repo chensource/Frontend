@@ -58,6 +58,7 @@ export default {
         if (valid) {
           this.loading = true;
           this.$store.dispatch('LoginByEmail', this.loginForm).then(() => {
+            console.log('success');
             this.loading = false;
             this.$router.push({ path: '/' });
             // this.showDialog = true;
