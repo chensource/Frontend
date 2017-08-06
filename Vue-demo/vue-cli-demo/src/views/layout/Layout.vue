@@ -63,13 +63,18 @@ export default {
     transition: all .28s ease-out;
   }
   .sidebar-container {
-    transition: all .28s ease-out;
-    position: absolute;
+    transition: width 0.28s ease-out;
+    width: 180px;
+    height: 100%;
+    position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
-    right: -17px;
-    overflow-y: scroll;
+    z-index: 1001;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none
+    }
   }
   .main-container {
     min-height: 100%;

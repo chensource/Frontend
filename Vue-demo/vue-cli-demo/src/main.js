@@ -8,6 +8,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-default/index.css';
 import 'normalize.css/normalize.css'; // normalize.css 样式格式化
 import 'assets/iconfont/iconfont'; // iconfont 具体图标见https://github.com/PanJiaChen/vue-element-admin/wiki
+import * as filters from './filters'; // 全局vue filter
 import NProgress from 'nprogress'; // Progress 进度条
 import IconSvg from 'components/Icon-svg'; // svg 组件
 import Multiselect from 'vue-multiselect'; // 使用的一个多选框组件，element-ui的select不能满足所有需求
@@ -25,12 +26,18 @@ Vue.use(ElementUI);
 Vue.use(vueWaves);
 // Vue.config.productionTip = false
 
+// register global utility filters.
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+});
+
 // permissiom judge
 // function hasPermission(roles, permissionRoles) {
 //   if (roles.indexOf('admin') >= 0) return true; // admin权限 直接通过
 //   if (!permissionRoles) return true;
 //   return roles.some(role => permissionRoles.indexOf(role) >= 0)
 // }
+
 
 
 const whiteList = ['/login', '/authredirect', '/reset', '/sendpwd']; // 不重定向白名单

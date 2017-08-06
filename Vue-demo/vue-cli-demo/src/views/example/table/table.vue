@@ -174,7 +174,7 @@ export default {
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 10,
+        limit: 20,
         importance: undefined,
         title: undefined,
         type: undefined,
@@ -325,13 +325,13 @@ export default {
       })
     },
     handleDownload() {
-      require.ensure([], () => {
-        // const { export_json_to_excel } = require('vendor/Export2Excel');
-        // const tHeader = ['时间', '地区', '类型', '标题', '重要性'];
-        // const filterVal = ['timestamp', 'province', 'type', 'title', 'importance'];
-        // const data = this.formatJson(filterVal, this.list);
-        // export_json_to_excel(tHeader, data, 'table数据');
-      })
+      // require.ensure([], () => {
+      //   const { export_json_to_excel } = require('vendor/Export2Excel');
+      //   const tHeader = ['时间', '地区', '类型', '标题', '重要性'];
+      //   const filterVal = ['timestamp', 'province', 'type', 'title', 'importance'];
+      //   const data = this.formatJson(filterVal, this.list);
+      //   export_json_to_excel(tHeader, data, 'table数据');
+      // })
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
