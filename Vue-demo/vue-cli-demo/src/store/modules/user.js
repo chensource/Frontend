@@ -1,46 +1,38 @@
-import { loginByEmail, logout, getInfo } from 'api/login';
+import { loginByAccount, logout, getInfo } from 'api/login';
 import { getToken, setToken, removeToken } from 'utils/auth';
 
 const user = {
   state: {
-    user: '',
-    status: '',
-    code: '',
-    token: getToken(),
-    name: '',
-    avatar: '',
-    introduction: '',
-    roles: [],
-    setting: {
-      articlePlatform: []
-    }
+    employeeno: '',
+    employeename: '',
+    domainaccount: '',
+    lastlogintime: '',
+    logincount: '',
+    rolecode: '',
+    groupcode: '',
+    token: getToken()
   },
 
   mutations: {
-    SET_CODE: (state, code) => {
-      state.code = code;
+    SET_CODE: (state, domainaccount) => {
+      state.domainaccount = domainaccount;
     },
     SET_TOKEN: (state, token) => {
       state.token = token;
     },
-    SET_INTRODUCTION: (state, introduction) => {
-      state.introduction = introduction;
+    SET_EMPLOYEENO(state, employeeno) {
+      state.employeeno = employeeno
     },
-    SET_SETTING: (state, setting) => {
-      state.setting = setting;
+    SET_NAME: (state, employeename) => {
+      state.employeename = employeename;
     },
-    SET_STATUS: (state, status) => {
-      state.status = status;
+    SET_ROLES: (state, rolecode) => {
+      state.rolecode = rolecode;
     },
-    SET_NAME: (state, name) => {
-      state.name = name;
+    SET_LASTLOGINTIME: (state, lastlogintime) => {
+      state.lastlogintime = lastlogintime;
     },
-    SET_AVATAR: (state, avatar) => {
-      state.avatar = avatar;
-    },
-    SET_ROLES: (state, roles) => {
-      state.roles = roles;
-    },
+
     LOGIN_SUCCESS: () => {
       console.log('login success')
     },
@@ -50,15 +42,16 @@ const user = {
   },
 
   actions: {
-    // 邮箱登录
-    LoginByEmail({ commit }, userInfo) {
-      const email = userInfo.email.trim();
+    LoginByAccount({ commit }, userInfo) {
+      const account = userInfo.account.trim();
       return new Promise((resolve, reject) => {
-        loginByEmail(email, userInfo.password).then(response => {
+        loginByAccount(account, userInfo.password).then(response => {
           const data = response.data;
-          setToken(response.data.token);
-          commit('SET_TOKEN', data.token);
-          resolve();
+          if (data.errcode === 0) {
+            setToken(data.result.Token);
+            commit('SET_TOKEN', data.result.Token);
+          }
+          resolve(response);
         }).catch(error => {
           reject(error);
         });
@@ -69,11 +62,12 @@ const user = {
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(response => {
-          const data = response.data;
-          commit('SET_ROLES', data.role);
-          commit('SET_NAME', data.name);
-          commit('SET_AVATAR', data.avatar);
-          commit('SET_INTRODUCTION', data.introduction);
+          const data = response.data.result;
+          commit('SET_ROLES', data.RoleCode);
+          commit('SET_NAME', data.EmployeeName);
+          commit('SET_CODE', data.DomainAccount);
+          commit('SET_EMPLOYEENO', data.EmployeeNo);
+          commit('SET_LASTLOGINTIME', data.LastLoginTime);
           resolve(response);
         }).catch(error => {
           reject(error);
@@ -87,7 +81,7 @@ const user = {
         commit('SET_CODE', code);
         loginByThirdparty(state.status, state.email, state.code).then(response => {
           commit('SET_TOKEN', response.data.token);
-          setToken(response.data.token);
+          setToken(response.data.result.token);
           resolve();
         }).catch(error => {
           reject(error);
@@ -116,16 +110,6 @@ const user = {
         removeToken();
         resolve();
       });
-    },
-
-    // 动态修改权限
-    ChangeRole({ commit }, role) {
-      return new Promise(resolve => {
-        commit('SET_ROLES', [role]);
-        commit('SET_TOKEN', role);
-        setToken(role);
-        resolve();
-      })
     }
   }
 };

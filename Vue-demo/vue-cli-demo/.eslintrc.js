@@ -59,7 +59,7 @@ module.exports = {
     'dot-location': ['error', 'property'],
 
     // enforce dot notation whenever possible
-    'dot-notation': 'error',
+    // 'dot-notation': 'error, { "allowPattern": "^[a-z]+(_[a-z]+)+$" }',
 
     // require the use of === and !==
     'eqeqeq': ['error', 'smart'],

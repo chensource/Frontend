@@ -98,66 +98,7 @@ export const constantRouterMap = [
 ]
 
 export default new Router({
-  // mode: 'history', //后端支持可开
+  // mode: 'history', // 后端支持可开
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 });
-
-
-export const asyncRouterMap = [
-  { path: '*', redirect: '/404', hidden: true },
-  {
-    path: '/example',
-    component: Layout,
-    redirect: 'noredirect',
-    name: '综合实例',
-    icon: 'zonghe',
-    children: [{
-      path: '/example/table',
-      component: TableLayout,
-      redirect: '/example/table/table',
-      name: 'Table',
-      children: [{
-        path: 'dynamictable',
-        component: DynamicTable,
-        name: '动态table'
-      },
-      {
-        path: 'dragtable',
-        component: DragTable,
-        name: '拖拽table'
-      },
-      {
-        path: 'inline_edit_table',
-        component: InlineEditTable,
-        name: 'table内编辑'
-      },
-      {
-        path: 'table',
-        component: Table,
-        name: '综合table'
-      }
-      ]
-    },
-    {
-      path: 'form/edit',
-      component: Form,
-      name: '编辑Form',
-      meta: {
-        isEdit: true
-      }
-    },
-    {
-      path: 'form/create',
-      component: Form,
-      name: '创建Form'
-    },
-
-    {
-      path: 'tab/index',
-      component: Tab,
-      name: 'Tab'
-    }
-    ]
-  }
-];

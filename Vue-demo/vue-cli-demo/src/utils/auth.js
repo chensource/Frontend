@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = 'CentaNet_WH_Admin_Token'
+const TokenKey = 'token_access'
 
 export function getToken() {
   return Cookies.get(TokenKey)
