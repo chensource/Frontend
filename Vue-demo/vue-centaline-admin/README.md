@@ -1,6 +1,6 @@
-# vue-centaline
+# vue-centaline-admin
 
-> wh admin centaline 
+> wh centaline admin
 
 ## Build Setup
 
