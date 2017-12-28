@@ -45,3 +45,17 @@ export default new Router({
 });
 
 export const asyncRouterMap = [{ path: '*', redirect: '/404', hidden: true }];
+
+// function generateRoutesFromMenu(menu = [], routes = []) {
+//   for (let i = 0, l = menu.length; i < l; i++) {
+//     const item = menu[i];
+//     if (item.path) {
+//       routes.push(item);
+//     }
+//     if (!item.component) {
+//       item.component = _import(item.component);
+//       generateRoutesFromMenu(item.children, routes);
+//     }
+//   }
+//   return routes;
+// }

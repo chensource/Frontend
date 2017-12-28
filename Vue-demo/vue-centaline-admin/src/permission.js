@@ -2,13 +2,19 @@ import router from './router';
 import store from './store';
 import NProgress from 'nprogress'; // Progress 进度条
 import 'nprogress/nprogress.css';// Progress 进度条样式
-import { getToken } from '@/utils/auth'; // 验权
+import { getToken } from '@/utils/auth'; // 验权 Token 信息
 import { Message } from 'element-ui';
 
 // permissiom judge
+// 权限判断
 function hasPermission(roles, permissionRoles) {
-  if (roles.indexOf('admin') >= 0) return true; // admin权限 直接通过
-  if (!permissionRoles) return true;
+  // admin权限 直接通过
+  if (roles.indexOf('admin') >= 0) {
+    return true;
+  }
+  if (!permissionRoles) {
+    return true;
+  }
   return roles.some(role => permissionRoles.indexOf(role) >= 0);
 }
 
@@ -23,11 +29,11 @@ router.beforeEach((to, from, next) => {
     } else {
       if (store.getters.roles.length === 0) { // 判断当前用户是否已拉取完user_info信息
         store.dispatch('GetUserInfo').then(res => { // 拉取user_info
-          const roles = res.data.role;
-          store.dispatch('GenerateRoutes', { roles }).then(() => { // 生成可访问的路由表
-            router.addRoutes(store.getters.addRouters); // 动态添加可访问路由表
-            next({ ...to, replace: true }); // hack方法 确保addRoutes已完成 ,replace: true so the navigation will not leave a history record
-          });
+          // const roles = res.data.role;
+          // store.dispatch('GenerateRoutes', { roles }).then(() => { // 生成可访问的路由表
+          //   router.addRoutes(store.getters.addRouters); // 动态添加可访问路由表
+          //   next({ ...to, replace: true }); // hack方法 确保addRoutes已完成 ,replace: true so the navigation will not leave a history record
+          // });
         }).catch(() => {
           store.dispatch('FedLogOut').then(() => {
             Message.error('验证失败,请重新登录');

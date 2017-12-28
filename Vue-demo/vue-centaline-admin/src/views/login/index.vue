@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { isvalidUsername } from "@/utils/validate";
+// import { isvalidUsername } from "@/utils/validate";
 import socialSign from "./socialsignin";
 
 export default {
@@ -49,13 +49,13 @@ export default {
   },
   name: "login",
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
-        callback(new Error("请输入正确的用户名"));
-      } else {
-        callback();
-      }
-    };
+    // const validateUsername = (rule, value, callback) => {
+    //   if (!isvalidUsername(value)) {
+    //     callback(new Error("请输入正确的用户名"));
+    //   } else {
+    //     callback();
+    //   }
+    // };
 
     const validatePassword = (rule, value, callback) => {
       if (value.length <= 6) {
@@ -67,12 +67,11 @@ export default {
 
     return {
       loginForm: {
-        username: "admin",
-        password: "111111"
+        username: "chenshi3",
+        password: "Chens1204."
       },
       loginRules: {
-        username: [
-          { required: true, trgger: "blur", validator: validateUsername },
+        password: [
           { required: true, trgger: "blur", validator: validatePassword }
         ]
       },

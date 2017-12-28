@@ -3,13 +3,12 @@ import { getToken, setToken, removeToken } from '@/utils/auth';
 
 const user = {
   state: {
-    user: '',
+    username: '',
+    domainAccount: '',
     status: '',
     code: '',
     token: getToken(),
     name: '',
-    avatar: '',
-    introduction: '',
     roles: [],
     setting: {
       articlePlatform: []
@@ -17,14 +16,14 @@ const user = {
   },
 
   mutations: {
+    SET_DOMAIN: (state, domainAccount) => {
+      state.domainAccount = domainAccount;
+    },
     SET_CODE: (state, code) => {
       state.code = code;
     },
     SET_TOKEN: (state, token) => {
       state.token = token;
-    },
-    SET_INTRODUCTION: (state, introduction) => {
-      state.introduction = introduction;
     },
     SET_SETTING: (state, setting) => {
       state.setting = setting;
@@ -34,9 +33,6 @@ const user = {
     },
     SET_NAME: (state, name) => {
       state.name = name;
-    },
-    SET_AVATAR: (state, avatar) => {
-      state.avatar = avatar;
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles;
@@ -49,9 +45,12 @@ const user = {
       const username = userInfo.username.trim();
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
-          const data = response.data;
-          commit('SET_TOKEN', data.token);
-          setToken(response.data.token);
+          const result = response.data;
+          const token = result.data.token;
+          // console.log(token);
+          commit('SET_TOKEN', token);
+          commit('SET_DOMAIN', username);
+          setToken(token);
           resolve();
         }).catch(error => {
           reject(error);
@@ -67,10 +66,8 @@ const user = {
             reject('error');
           }
           const data = response.data;
-          commit('SET_ROLES', data.role);
+          // commit('SET_ROLES', data.role);
           commit('SET_NAME', data.name);
-          commit('SET_AVATAR', data.avatar);
-          commit('SET_INTRODUCTION', data.introduction);
           resolve(response);
         }).catch(error => {
           reject(error);
