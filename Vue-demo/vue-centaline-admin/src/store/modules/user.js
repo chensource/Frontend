@@ -71,8 +71,8 @@ const user = {
           console.log(data);
           commit('SET_ROLES', data.role);
           commit('SET_NAME', data.name);
-          commit('SET_AVATAR', data.avatar);
-          commit('SET_INTRODUCTION', data.introduction);
+          // commit('SET_AVATAR', data.avatar);
+          // commit('SET_INTRODUCTION', data.introduction);
           resolve(response);
         }).catch(error => {
           reject(error);
@@ -126,8 +126,8 @@ const user = {
           const data = response.data;
           commit('SET_ROLES', data.role);
           commit('SET_NAME', data.name);
-          commit('SET_AVATAR', data.avatar);
-          commit('SET_INTRODUCTION', data.introduction);
+          // commit('SET_AVATAR', data.avatar);
+          // commit('SET_INTRODUCTION', data.introduction);
           resolve();
         });
       });

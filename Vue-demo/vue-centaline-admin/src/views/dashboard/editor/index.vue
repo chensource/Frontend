@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-editor-container">
     <div class=" clearfix">
-      <pan-thumb style="float: left" :image="avatar"> 你的权限:
+      <pan-thumb style="float: left"> 你的权限:
         <span class="pan-info-roles" :key='item' v-for="item in roles">{{item}}</span>
       </pan-thumb>
       <github-corner></github-corner>
@@ -31,7 +31,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["name", "avatar", "roles"])
+    ...mapGetters(["name", "roles"])
   }
 };
 </script>
