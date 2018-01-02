@@ -1,9 +1,9 @@
 import request from '@/utils/request';
 
-export function getPermission(domainAccount) {
+export function getPermission(account) {
   return request({
     url: '/account/permission',
     method: 'get',
-    params: { domainAccount }
+    params: { account }
   });
 }
