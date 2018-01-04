@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-editor-container">
     <github-corner></github-corner>
-
+    <h1>武汉管理后台</h1>
   </div>
 </template>
 

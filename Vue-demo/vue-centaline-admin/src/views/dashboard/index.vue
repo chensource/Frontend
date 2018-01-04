@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <component :is="currentRole"></component>
+    <h1>武汉管理后台</h1>
   </div>
 </template>
 
