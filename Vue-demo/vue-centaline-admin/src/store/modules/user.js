@@ -61,7 +61,7 @@ const user = {
           }
           const result = response.data;
           commit('SET_ROLES', result.data.role);
-          console.log(result.data.employeeName);
+          // console.log(result.data.employeeName);
           commit('SET_NAME', result.data.employeeName);
           resolve(response);
         }).catch(error => {

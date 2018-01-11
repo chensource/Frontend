@@ -23,6 +23,7 @@ export default {
     lineChart: '折线图',
     mixChart: '混合图表',
     example: '综合实例',
+    contract: '成交管理',
     Table: 'Table',
     dynamicTable: '动态table',
     dragTable: '拖拽table',

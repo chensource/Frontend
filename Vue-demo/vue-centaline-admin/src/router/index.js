@@ -153,6 +153,35 @@ export const asyncRouterMap = [
       // { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'tab', meta: { title: 'tab' }}
     ]
   },
+  {
+    path: '/contract',
+    component: Layout,
+    redirect: '/contract/table/complex-table',
+    name: 'contract',
+    meta: {
+      title: 'contract',
+      icon: 'example'
+    },
+    children: [
+      {
+        path: '/contract/table',
+        component: _import('contract/table/index'),
+        redirect: '/contract/table/complex-table',
+        name: 'Table',
+        meta: {
+          title: 'Table',
+          icon: 'table'
+        },
+        children: [
+          // { path: 'dynamic-table', component: _import('contract/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: 'dynamicTable' }},
+          // { path: 'drag-table', component: _import('contract/table/dragTable'), name: 'dragTable', meta: { title: 'dragTable' }},
+          // { path: 'inline-edit-table', component: _import('contract/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'inlineEditTable' }},
+          { path: 'complex-table', component: _import('contract/table/complexTable'), name: 'complexTable', meta: { title: 'complexTable' }}
+        ]
+      }
+      // { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'tab', meta: { title: 'tab' }}
+    ]
+  },
 
   // {
   //   path: '/form',
