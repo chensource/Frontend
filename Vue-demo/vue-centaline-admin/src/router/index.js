@@ -95,14 +95,37 @@ export const asyncRouterMap = [
   //     { path: 'mixchart', component: _import('charts/mixChart'), name: 'mixChart', meta: { title: 'mixChart', noCache: true }}
   //   ]
   // },
-
+  {
+    path: '/callrecord',
+    component: Layout,
+    redirect: '/callrecord/list',
+    name: 'callrecord',
+    meta: {
+      title: 'callrecord',
+      icon: 'tell'
+    },
+    children: [
+      {
+        path: '/contract/list',
+        component: _import('contract/table/index'),
+        redirect: '/callrecord',
+        name: 'Table',
+        meta: {
+          title: 'dealTable'
+        },
+        children: [
+          { path: 'callrecord-list', component: _import('callrecord/list'), name: 'callrecord-list', meta: { title: 'callrecordlist' }}
+        ]
+      }
+    ]
+  },
   {
     path: '/contract',
     component: Layout,
     redirect: '/contract/table/deal-tabel',
     name: 'contract',
     meta: {
-      title: 'contract',
+      title: 'deal',
       icon: 'money'
     },
     children: [
@@ -118,10 +141,9 @@ export const asyncRouterMap = [
           // { path: 'dynamic-table', component: _import('contract/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: 'dynamicTable' }},
           // { path: 'drag-table', component: _import('contract/table/dragTable'), name: 'dragTable', meta: { title: 'dragTable' }},
           // { path: 'inline-edit-table', component: _import('contract/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'inlineEditTable' }},
-          { path: 'deal-table', component: _import('contract/table/dealTable'), name: 'dealTable', meta: { title: 'dealTable' }}
+          { path: 'deal-table', component: _import('contract/table/dealTable'), name: 'dealTable', meta: { title: 'deallist' }}
         ]
       }
-      // { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'tab', meta: { title: 'tab' }}
     ]
   },
   // {
