@@ -7,8 +7,8 @@
         <el-option v-for="item in tradeOptions" :key="item.key" :label="item.name" :value="item.value">
         </el-option>
       </el-select>
-      <el-select clearable class="filter-item" style="width: 130px" v-model="listQuery.type" placeholder="来源">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key">
+      <el-select clearable class="filter-item" style="width: 130px" v-model="listQuery.comeFrom" placeholder="来源">
+        <el-option v-for="item in sourceOptions" :key="item.key" :label="item.name" :value="item.value">
         </el-option>
       </el-select>
 
@@ -69,11 +69,11 @@
     </el-table>
     <div v-show="!listLoading" class="pagination-container">
       <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.page"
-        :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" layout="total, prev, pager, next" :total="total">
+        :page-size="listQuery.limit" layout="total, prev, pager, next" :total="total">
       </el-pagination>
     </div>
 
-    <!-- <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form :rules="rules" ref="dataForm" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
         <el-form-item label="类型" prop="type">
           <el-select class="filter-item" v-model="temp.type" placeholder="请选择">
@@ -106,7 +106,6 @@
         <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">确 定</el-button>
         <el-button v-else type="primary" @click="updateData">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-
       </div>
     </el-dialog>
 
@@ -118,7 +117,7 @@
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false">确 定</el-button>
       </span>
-    </el-dialog> -->
+    </el-dialog>
   </div>
 </template>
 
@@ -128,17 +127,15 @@ import { fetchList } from "@/api/contract";
 import waves from "@/directive/waves"; // 水波纹指令
 import { parseTime } from "@/utils";
 
-const calendarTypeOptions = [
-  { key: "CN", display_name: "中国" },
-  { key: "US", display_name: "美国" },
-  { key: "JP", display_name: "日本" },
-  { key: "EU", display_name: "欧元区" }
-];
-
 const tradeOptions = [
   { key: 1, name: "新房", value: "新" },
   { key: 2, name: "出售", value: "售" },
   { key: 3, name: "出租", value: "租" }
+];
+
+const sourceOptions = [
+  { key: 1, name: "新房", value: "Newprop" },
+  { key: 2, name: "二手房", value: "esf" }
 ];
 
 // arr to obj ,such as { CN : "中国", US : "美国" }
@@ -148,7 +145,7 @@ const tardeTypeKeyValue = tradeOptions.reduce((acc, cur) => {
 }, {});
 
 export default {
-  name: "complexTable",
+  name: "dealTabel",
   directives: {
     waves
   },
@@ -163,10 +160,11 @@ export default {
         page: 1,
         limit: 10,
         trade: undefined,
-        type: undefined
+        type: undefined,
+        comeFrom: undefined
       },
       tradeOptions,
-      calendarTypeOptions,
+      sourceOptions,
       sortOptions: [
         { label: "按ID升序列", key: "+id" },
         { label: "按ID降序", key: "-id" }

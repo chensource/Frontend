@@ -40,6 +40,7 @@ export const constantRouterMap = [
     path: '/documentation',
     component: Layout,
     redirect: '/documentation/index',
+    hidden: true,
     children: [{
       path: 'index',
       component: _import('documentation/index'),
@@ -54,36 +55,7 @@ export default new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 });
-
 export const asyncRouterMap = [
-  {
-    path: '/permission',
-    component: Layout,
-    redirect: '/permission/index',
-    meta: { role: ['admin'] },
-    children: [{
-      path: 'index',
-      component: _import('permission/index'),
-      name: 'permission',
-      meta: {
-        title: 'permission',
-        icon: 'lock',
-        role: ['admin']
-      }
-    }]
-  },
-
-  {
-    path: '/icon',
-    component: Layout,
-    children: [{
-      path: 'index',
-      component: _import('svg-icons/index'),
-      name: 'icons',
-      meta: { title: 'icons', icon: 'icon', noCache: true }
-    }]
-  },
-
   // {
   //   path: '/components',
   //   component: Layout,
@@ -125,64 +97,33 @@ export const asyncRouterMap = [
   // },
 
   {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table/complex-table',
-    name: 'example',
-    meta: {
-      title: 'example',
-      icon: 'example'
-    },
-    children: [
-      {
-        path: '/example/table',
-        component: _import('example/table/index'),
-        redirect: '/example/table/complex-table',
-        name: 'Table',
-        meta: {
-          title: 'Table',
-          icon: 'table'
-        },
-        children: [
-          // { path: 'dynamic-table', component: _import('example/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: 'dynamicTable' }},
-          // { path: 'drag-table', component: _import('example/table/dragTable'), name: 'dragTable', meta: { title: 'dragTable' }},
-          // { path: 'inline-edit-table', component: _import('example/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'inlineEditTable' }},
-          { path: 'complex-table', component: _import('example/table/complexTable'), name: 'complexTable', meta: { title: 'complexTable' }}
-        ]
-      }
-      // { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'tab', meta: { title: 'tab' }}
-    ]
-  },
-  {
     path: '/contract',
     component: Layout,
-    redirect: '/contract/table/complex-table',
+    redirect: '/contract/table/deal-tabel',
     name: 'contract',
     meta: {
       title: 'contract',
-      icon: 'example'
+      icon: 'money'
     },
     children: [
       {
         path: '/contract/table',
         component: _import('contract/table/index'),
-        redirect: '/contract/table/complex-table',
+        redirect: '/contract/table/deal-table',
         name: 'Table',
         meta: {
-          title: 'Table',
-          icon: 'table'
+          title: 'dealTable'
         },
         children: [
           // { path: 'dynamic-table', component: _import('contract/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: 'dynamicTable' }},
           // { path: 'drag-table', component: _import('contract/table/dragTable'), name: 'dragTable', meta: { title: 'dragTable' }},
           // { path: 'inline-edit-table', component: _import('contract/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'inlineEditTable' }},
-          { path: 'complex-table', component: _import('contract/table/complexTable'), name: 'complexTable', meta: { title: 'complexTable' }}
+          { path: 'deal-table', component: _import('contract/table/dealTable'), name: 'dealTable', meta: { title: 'dealTable' }}
         ]
       }
       // { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'tab', meta: { title: 'tab' }}
     ]
   },
-
   // {
   //   path: '/form',
   //   component: Layout,

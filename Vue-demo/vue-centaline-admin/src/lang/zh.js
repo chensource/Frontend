@@ -29,6 +29,8 @@ export default {
     dragTable: '拖拽table',
     inlineEditTable: 'table内编辑',
     complexTable: '综合table',
+    deal: "成交",
+    dealTable: '成交列表',
     tab: 'Tab',
     form: '表单',
     createForm: '创建表单',
