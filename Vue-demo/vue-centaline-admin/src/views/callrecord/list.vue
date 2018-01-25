@@ -10,16 +10,9 @@
       <el-select clearable class="filter-item" style="width: 130px" v-model="listQuery.iscentaline" placeholder="来源">
         <el-option v-for="item in tradeOptions" :key="item.key" :label="item.name" :value="item.value">
         </el-option>
-      </el-select>
-
-      <!-- <el-select @change='handleFilter' style="width: 120px" class="filter-item" v-model="listQuery.sort" placeholder="排序">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key">
-        </el-option>
-      </el-select> -->
+       </el-select>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
-      <!-- <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">添加</el-button> -->
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-download" @click="handleDownload">导出</el-button>
-      <!-- <el-checkbox class="filter-item" style='margin-left:15px;' @change='tableKey=tableKey+1' v-model="showAuditor">显示审核人</el-checkbox> -->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
@@ -31,8 +24,6 @@
       </el-table-column>
       <el-table-column width="100px" align="center" label="通话编号">
         <template slot-scope="scope">
-          <!-- <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span> -->
-          <!-- <el-tag>{{scope.row.type | typeFilter}}</el-tag> -->
            <span>{{scope.row.callId}}</span>
         </template>
       </el-table-column>
@@ -90,49 +81,60 @@
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form :rules="rules" ref="dataForm" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
-        <el-form-item label="类型" prop="type">
-          <el-select class="filter-item" v-model="temp.type" placeholder="请选择">
-            <el-option v-for="item in  calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="时间" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="date" format="yyyy-MM-dd" placeholder="选择日期时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="temp.title"></el-input>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select class="filter-item" v-model="temp.status" placeholder="请选择">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="重要性">
-          <el-rate style="margin-top:8px;" v-model="temp.trade" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max='3'></el-rate>
-        </el-form-item>
-        <el-form-item label="点评">
-          <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" v-model="temp.remark">
-          </el-input>
-        </el-form-item>
+      <el-steps :active="stepQuery.step" simple align-center finish-status="success">
+        <el-step title="基本信息"></el-step>
+        <el-step title="客户信息"></el-step>
+        <el-step title="顾问评分"></el-step>
+      </el-steps>
+      <el-form :rules="rules" ref="dataForm" :model="temp" label-position="left" style='width: 700px; margin:25px 0 0 75px;'>
+        <div v-show="stepQuery.step == 1">
+          <el-form-item label="通话录音">
+            <VueAudio />
+          </el-form-item>
+          <el-form-item label="来电项目">
+            <span>{{ temp.calledMsg }}</span>
+          </el-form-item>
+          <el-form-item label="来电电话">
+            <span>{{ temp.caller }}</span>
+          </el-form-item>
+          <el-form-item label="接听人工号">
+             <span>{{ temp.calledNo }}</span>
+          </el-form-item>
+          <el-form-item label="接听人姓名">
+            <span>{{ temp.calledName }}</span>
+          </el-form-item>
+           <el-form-item label="接听人电话">
+            <span>{{ temp.called }}</span>
+          </el-form-item>
+        </div>
+        <div v-show="stepQuery.step == 2">
+          <el-form-item label="是否接通">
+            <el-switch v-model="temp.isConnected"></el-switch>
+          </el-form-item>
+          <el-form-item label="是否有效">
+            <el-switch v-model="temp.isEffective"></el-switch>
+          </el-form-item>
+          <el-form-item label="物业类型">
+            <el-select clearable class="filter-item" style="width: 130px" v-model="listQuery.iscentaline" placeholder="物业类型">
+              <el-option v-for="item in tradeOptions" :key="item.key" :label="item.name" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="意向区域">
+          </el-form-item>
+          <el-form-item label="意向区域">
+          </el-form-item>
+        </div>
+        <div v-show="stepQuery.step == 3">
+          3
+        </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">确 定</el-button>
-        <el-button v-else type="primary" @click="updateData">确 定</el-button>
+        <el-button @click="handlePreStep" v-show="stepQuery.preStep">上一步</el-button>
+        <el-button @click="handleNextStep" v-show="stepQuery.nextStep">下一步</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button v-show="stepQuery.step == 3" type="primary" @click="updateData">确 定</el-button>
       </div>
-    </el-dialog>
-
-    <el-dialog title="阅读数统计" :visible.sync="dialogPvVisible">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="渠道"> </el-table-column>
-        <el-table-column prop="pv" label="pv"> </el-table-column>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">确 定</el-button>
-      </span>
     </el-dialog>
   </div>
 </template>
@@ -142,6 +144,7 @@ import { fetchList } from "@/api/callrecord";
 
 import waves from "@/directive/waves"; // 水波纹指令
 import { parseTime } from "@/utils";
+import VueAudio from "@/components/Audio";
 
 // const tradeOptions = [
 //   { key: 1, name: "新房", value: "新" },
@@ -164,6 +167,9 @@ export default {
   name: "dealTabel",
   directives: {
     waves
+  },
+  components: {
+    VueAudio
   },
   data() {
     return {
@@ -203,17 +209,29 @@ export default {
           name: "二手房"
         }
       ],
-      // sourceOptions,
       statusOptions: ["published", "draft", "deleted"],
       showAuditor: false,
       temp: {
         id: undefined,
-        trade: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published"
+        isConnected: true,
+        isEffective: true,
+        propertyType: 1,
+        intentionArea: null,
+        unitPrice: null,
+        minArea: null,
+        maxArea: null,
+        remark: null,
+        isCourtesy: false,
+        isPatienty: false,
+        isInvitation: false,
+        isTransfer: false,
+        timestamp: new Date()
+      },
+      stepQuery: {
+        step: 1,
+        preStep: false,
+        nextStep: true,
+        showDiv: true
       },
       dialogFormVisible: false,
       dialogStatus: "",
@@ -222,7 +240,6 @@ export default {
         create: "创建"
       },
       dialogPvVisible: false,
-      pvData: [],
       rules: {
         type: [
           { required: true, message: "type is required", trigger: "change" }
@@ -257,15 +274,37 @@ export default {
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then(response => {
-        console.log(this.listQuery);
         this.list = response.data.data.items;
         this.total = response.data.data.total;
         this.listLoading = false;
       });
     },
+    handlePreStep() {
+      this.stepQuery.step--;
+      this.goStep(this.stepQuery.step);
+    },
+    handleNextStep() {
+      this.stepQuery.step++;
+      this.goStep(this.stepQuery.step);
+    },
+    goStep: function(n) {
+      switch (n) {
+        case 1:
+          this.stepQuery.preStep = false;
+          this.stepQuery.nextStep = true;
+          break;
+        case 2:
+          this.stepQuery.preStep = true;
+          this.stepQuery.nextStep = true;
+          break;
+        case 3:
+          this.stepQuery.preStep = true;
+          this.stepQuery.nextStep = false;
+          break;
+      }
+    },
     handleFilter() {
       this.listQuery.page = 1;
-      console.log(this.listQuery.trade);
       this.getList();
     },
     handleSizeChange(val) {
@@ -276,41 +315,23 @@ export default {
       this.listQuery.page = val;
       this.getList();
     },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: "操作成功",
-        type: "success"
-      });
-      row.status = status;
-    },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        trade: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: ""
+    resetStepQuery() {
+      this.stepQuery = {
+        step: 1,
+        preStep: false,
+        nextStep: true
       };
     },
     handleCreate() {
-      this.resetTemp();
+      this.resetStepQuery();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].clearValidate();
       });
     },
-    createData() {
-      this.$refs["dataForm"].validate(valid => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "原创作者";
-        }
-      });
-    },
     handleUpdate(row) {
+      this.resetStepQuery();
       this.temp = Object.assign({}, row); // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = "update";
@@ -337,7 +358,6 @@ export default {
       const index = this.list.indexOf(row);
       this.list.splice(index, 1);
     },
-
     handleDownload() {
       require.ensure([], () => {
         const { export_json_to_excel } = require("@/vendor/Export2Excel");

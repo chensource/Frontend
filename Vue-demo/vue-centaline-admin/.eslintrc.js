@@ -12,7 +12,7 @@ module.exports = {
   extends: 'eslint:recommended',
   // required to lint *.vue files
   plugins: [
-    'html'
+    'html',
   ],
   // check if imports actually resolve
   'settings': {
@@ -196,4 +196,3 @@ module.exports = {
     'array-bracket-spacing': [2, 'never']
   }
 }
-
