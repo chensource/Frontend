@@ -10,7 +10,11 @@
       <el-select clearable class="filter-item" style="width: 130px" v-model="listQuery.iscentaline" placeholder="来源">
         <el-option v-for="item in tradeOptions" :key="item.key" :label="item.name" :value="item.value">
         </el-option>
-       </el-select>
+      </el-select>
+      <el-select clearable class="filter-item" style="width: 130px" v-model="listQuery.calledStatus" placeholder="通话状态">
+        <el-option v-for="item in calledStatusOptions" :key="item.key" :label="item.name" :value="item.value">
+        </el-option>
+      </el-select>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
@@ -54,7 +58,7 @@
       </el-table-column>
       <el-table-column min-width="70px"  align="center" label="新房来电">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.isNewprop | statusFilter">
+          <el-tag :type="scope.row.isNewprop |  iconFilter">
             <i v-if="scope.row.isNewprop" class="el-icon-success"></i>
             <i v-else class="el-icon-error"></i>
           </el-tag>
@@ -62,7 +66,7 @@
       </el-table-column>
        <el-table-column min-width="70px"  align="center" label="公司来电">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.isCentaline | statusFilter">
+          <el-tag :type="scope.row.isCentaline | iconFilter">
             <i v-if="scope.row.isCentaline" class="el-icon-success"></i>
             <i v-else class="el-icon-error"></i>
           </el-tag>
@@ -89,7 +93,7 @@
       <el-form :rules="rules" ref="dataForm" :model="temp" label-position="left" style='width: 700px; margin:25px 0 0 75px;'>
         <div v-show="stepQuery.step == 1">
           <el-form-item label="通话录音">
-            <VueAudio />
+            <VueAudio :theUrl="temp.audioStr" />
           </el-form-item>
           <el-form-item label="来电项目">
             <span>{{ temp.calledMsg }}</span>
@@ -164,7 +168,7 @@ import VueAudio from "@/components/Audio";
 // }, {});
 
 export default {
-  name: "dealTabel",
+  name: "calledlist",
   directives: {
     waves
   },
@@ -183,7 +187,8 @@ export default {
         limit: 10,
         iscentaline: null,
         type: undefined,
-        isnewprop: null
+        isnewprop: null,
+        calledStatus: 0
       },
       tradeOptions: [
         {
@@ -209,7 +214,18 @@ export default {
           name: "二手房"
         }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      calledStatusOptions: [
+        {
+          key: 1,
+          value: 0,
+          name: "已接通"
+        },
+        {
+          key: 2,
+          value: -1,
+          name: "未接通"
+        }
+      ],
       showAuditor: false,
       temp: {
         id: undefined,
@@ -225,13 +241,14 @@ export default {
         isPatienty: false,
         isInvitation: false,
         isTransfer: false,
-        timestamp: new Date()
+        CalledStatus: 0,
+        timestamp: new Date(),
+        audioStr: ""
       },
       stepQuery: {
         step: 1,
         preStep: false,
-        nextStep: true,
-        showDiv: true
+        nextStep: true
       },
       dialogFormVisible: false,
       dialogStatus: "",
@@ -259,7 +276,7 @@ export default {
     };
   },
   filters: {
-    statusFilter(status) {
+    iconFilter(status) {
       const statusMap = {
         true: "success",
         false: "danger"
@@ -287,6 +304,7 @@ export default {
       this.stepQuery.step++;
       this.goStep(this.stepQuery.step);
     },
+    getAudioUrl() {},
     goStep: function(n) {
       switch (n) {
         case 1:
@@ -322,18 +340,19 @@ export default {
         nextStep: true
       };
     },
-    handleCreate() {
-      this.resetStepQuery();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
-    },
     handleUpdate(row) {
       this.resetStepQuery();
+
       this.temp = Object.assign({}, row); // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp);
+
+      this.temp.audioStr =
+        "http://10.4.18.13/RecordingDownLoad.aspx?userid=" +
+        this.temp.calledNo +
+        "&id=" +
+        this.temp.callId;
+
+      console.log(this.temp.audioStr);
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.$nextTick(() => {

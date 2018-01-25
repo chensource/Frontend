@@ -1,8 +1,8 @@
 <template>
   <div class="di main-wrap" v-loading="audio.waiting">
     <!-- 这里设置了ref属性后，在vue组件中，就可以用this.$refs.audio来访问该dom元素 -->
-    <audio ref="audio" class="dn"
-            :src="url" :preload="audio.preload"
+    <audio v-if="theUrl" ref="audio" class="dn"
+            :src="theUrl" :preload="audio.preload"
             @play="onPlay"
             @error="onError"
             @waiting="onWaiting"
@@ -12,7 +12,7 @@
     ></audio>
     <div>
       <el-button type="text" @click="startPlayOrPause">
-        <svg-icon :icon-class="[ audio.playing ?'pause':'player']" />
+        <svg-icon :icon-class="audio.playing ? 'pause':'player'" />
         {{ audio.playing | transPlayPause }}
       </el-button>
       <el-button v-show="!controlList.noSpeed" type="text" @click="changeSpeed">{{audio.speed | transSpeed}}</el-button>
@@ -88,7 +88,7 @@ export default {
         // 不显示进度条
         noProcess: true,
         // 只能播放一个
-        onlyOnePlaying: true,
+        onlyOnePlaying: false,
         // 不要快进按钮
         noSpeed: false
       }
@@ -102,6 +102,7 @@ export default {
           this.controlList[item] = true;
         }
       });
+      console.log(this.url);
     },
     changeSpeed() {
       const index = this.speeds.indexOf(this.audio.speed) + 1;
@@ -162,9 +163,7 @@ export default {
       if (!this.controlList.onlyOnePlaying) {
         return;
       }
-
       const target = res.target;
-
       const audios = document.getElementsByTagName("audio");
 
       [...audios].forEach(item => {
@@ -185,8 +184,6 @@ export default {
     // 当加载语音流元数据完成后，会触发该事件的回调函数
     // 语音元数据主要是语音的长度之类的数据
     onLoadedmetadata(res) {
-      console.log("loadedmetadata");
-      console.log(res);
       this.audio.waiting = false;
       this.audio.maxTime = parseInt(res.target.duration);
     }

@@ -20,39 +20,64 @@ import Layout from '../views/layout/Layout';
     noCache: true                if fasle ,the page will no be cached(default is false)
   }
 **/
-export const constantRouterMap = [
-  { path: '/login', component: _import('login/index'), hidden: true },
-  { path: '/authredirect', component: _import('login/authredirect'), hidden: true },
-  { path: '/404', component: _import('errorPage/404'), hidden: true },
-  { path: '/401', component: _import('errorPage/401'), hidden: true },
-  {
-    path: '',
-    component: Layout,
-    redirect: 'dashboard',
-    children: [{
-      path: 'dashboard',
-      component: _import('dashboard/index'),
-      name: 'dashboard',
-      meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
-    }]
-  },
-  {
-    path: '/documentation',
-    component: Layout,
-    redirect: '/documentation/index',
-    hidden: true,
-    children: [{
-      path: 'index',
-      component: _import('documentation/index'),
-      name: 'documentation',
-      meta: { title: 'documentation', icon: 'documentation', noCache: true }
-    }]
-  }
+export const constantRouterMap = [{
+  path: '/login',
+  component: _import('login/index'),
+  hidden: true
+},
+{
+  path: '/authredirect',
+  component: _import('login/authredirect'),
+  hidden: true
+},
+{
+  path: '/404',
+  component: _import('errorPage/404'),
+  hidden: true
+},
+{
+  path: '/401',
+  component: _import('errorPage/401'),
+  hidden: true
+},
+{
+  path: '',
+  component: Layout,
+  redirect: 'dashboard',
+  children: [{
+    path: 'dashboard',
+    component: _import('dashboard/index'),
+    name: 'dashboard',
+    meta: {
+      title: 'dashboard',
+      icon: 'dashboard',
+      noCache: true
+    }
+  }]
+},
+{
+  path: '/documentation',
+  component: Layout,
+  redirect: '/documentation/index',
+  hidden: true,
+  children: [{
+    path: 'index',
+    component: _import('documentation/index'),
+    name: 'documentation',
+    meta: {
+      title: 'documentation',
+      icon: 'documentation',
+      noCache: true
+    }
+  }]
+}
 ];
 
 export default new Router({
   // mode: 'history', //后端支持可开
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({
+    y: 0
+  }),
   routes: constantRouterMap
 });
 export const asyncRouterMap = [
@@ -104,20 +129,23 @@ export const asyncRouterMap = [
       title: 'callrecord',
       icon: 'tell'
     },
-    children: [
-      {
-        path: '/contract/list',
-        component: _import('contract/table/index'),
-        redirect: '/callrecord',
-        name: 'Table',
+    children: [{
+      path: '/contract/list',
+      component: _import('contract/table/index'),
+      redirect: '/callrecord',
+      name: 'Table',
+      meta: {
+        title: 'dealTable'
+      },
+      children: [{
+        path: 'callrecord-list',
+        component: _import('callrecord/list'),
+        name: 'callrecord-list',
         meta: {
-          title: 'dealTable'
-        },
-        children: [
-          { path: 'callrecord-list', component: _import('callrecord/list'), name: 'callrecord-list', meta: { title: 'callrecordlist' }}
-        ]
-      }
-    ]
+          title: 'callrecordlist'
+        }
+      }]
+    }]
   },
   {
     path: '/contract',
@@ -128,23 +156,29 @@ export const asyncRouterMap = [
       title: 'deal',
       icon: 'money'
     },
-    children: [
-      {
-        path: '/contract/table',
-        component: _import('contract/table/index'),
-        redirect: '/contract/table/deal-table',
-        name: 'Table',
-        meta: {
-          title: 'dealTable'
-        },
-        children: [
-          // { path: 'dynamic-table', component: _import('contract/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: 'dynamicTable' }},
-          // { path: 'drag-table', component: _import('contract/table/dragTable'), name: 'dragTable', meta: { title: 'dragTable' }},
-          // { path: 'inline-edit-table', component: _import('contract/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'inlineEditTable' }},
-          { path: 'deal-table', component: _import('contract/table/dealTable'), name: 'dealTable', meta: { title: 'deallist' }}
-        ]
-      }
-    ]
+    hidden: true,
+    children: [{
+      path: '/contract/table',
+      component: _import('contract/table/index'),
+      redirect: '/contract/table/deal-table',
+      name: 'Table',
+      meta: {
+        title: 'dealTable'
+      },
+      children: [
+        // { path: 'dynamic-table', component: _import('contract/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: 'dynamicTable' }},
+        // { path: 'drag-table', component: _import('contract/table/dragTable'), name: 'dragTable', meta: { title: 'dragTable' }},
+        // { path: 'inline-edit-table', component: _import('contract/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'inlineEditTable' }},
+        {
+          path: 'deal-table',
+          component: _import('contract/table/dealTable'),
+          name: 'dealTable',
+          meta: {
+            title: 'deallist'
+          }
+        }
+      ]
+    }]
   },
   // {
   //   path: '/form',
@@ -170,9 +204,24 @@ export const asyncRouterMap = [
       title: 'errorPages',
       icon: '404'
     },
-    children: [
-      { path: '401', component: _import('errorPage/401'), name: 'page401', meta: { title: 'page401', noCache: true }},
-      { path: '404', component: _import('errorPage/404'), name: 'page404', meta: { title: 'page404', noCache: true }}
+    children: [{
+      path: '401',
+      component: _import('errorPage/401'),
+      name: 'page401',
+      meta: {
+        title: 'page401',
+        noCache: true
+      }
+    },
+    {
+      path: '404',
+      component: _import('errorPage/404'),
+      name: 'page404',
+      meta: {
+        title: 'page404',
+        noCache: true
+      }
+    }
     ]
   },
 
@@ -180,8 +229,20 @@ export const asyncRouterMap = [
     path: '/error-log',
     component: Layout,
     redirect: 'noredirect',
-    children: [{ path: 'log', component: _import('errorLog/index'), name: 'errorLog', meta: { title: 'errorLog', icon: 'bug' }}]
+    children: [{
+      path: 'log',
+      component: _import('errorLog/index'),
+      name: 'errorLog',
+      meta: {
+        title: 'errorLog',
+        icon: 'bug'
+      }
+    }]
   },
 
-  { path: '*', redirect: '/404', hidden: true }
+  {
+    path: '*',
+    redirect: '/404',
+    hidden: true
+  }
 ];
