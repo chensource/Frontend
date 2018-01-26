@@ -1,8 +1,6 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <!-- <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="标题" v-model="listQuery.title">
-      </el-input> -->
       <el-select clearable class="filter-item" style="width: 120px" v-model="listQuery.isnewprop" placeholder="类型">
         <el-option v-for="item in sourceOptions" :key="item.key" :label="item.name" :value="item.value">
         </el-option>
@@ -15,6 +13,17 @@
         <el-option v-for="item in calledStatusOptions" :key="item.key" :label="item.name" :value="item.value">
         </el-option>
       </el-select>
+      <el-date-picker class="filter-item"
+        v-model="dateRange"
+        type="daterange"
+        range-separator="-"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        :picker-options="pickerOptions"
+        unlink-panels
+        value-format="yyyy-MM-dd"
+      >
+      </el-date-picker>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
@@ -67,12 +76,11 @@
        <el-table-column min-width="70px"  align="center" label="公司来电">
         <template slot-scope="scope">
           <el-tag :type="scope.row.isCentaline | iconFilter">
-            <i v-if="scope.row.isCentaline" class="el-icon-success"></i>
-            <i v-else class="el-icon-error"></i>
+            <i :class="scope.row.isCentaline?'el-icon-success':'el-icon-error'"></i>
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="220" class-name="small-padding">
+      <el-table-column align="center" label="操作" width="0" class-name="small-padding">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
         </template>
@@ -84,16 +92,16 @@
       </el-pagination>
     </div>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-steps :active="stepQuery.step" simple align-center finish-status="success">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" @close="handleDialogClose()">
+      <el-steps :active="stepQuery.step" align-center finish-status="success">
         <el-step title="基本信息"></el-step>
         <el-step title="客户信息"></el-step>
         <el-step title="顾问评分"></el-step>
       </el-steps>
-      <el-form :rules="rules" ref="dataForm" :model="temp" label-position="left" style='width: 700px; margin:25px 0 0 75px;'>
+      <el-form :rules="rules" ref="dataForm" :model="temp" label-width="100px" label-position="left" style='width: 600px; margin:20px 0 0 70px;'>
         <div v-show="stepQuery.step == 1">
           <el-form-item label="通话录音">
-            <VueAudio :theUrl="temp.audioStr" />
+            <VueAudio :theUrl="audioStr" :theError="false" :thePlaying="temp.playing" />
           </el-form-item>
           <el-form-item label="来电项目">
             <span>{{ temp.calledMsg }}</span>
@@ -124,18 +132,40 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="意向区域">
+          <el-form-item label="单价">
+            <el-input v-model="temp.unitPrice" placeholder="单价" style="width: 130px"></el-input>
           </el-form-item>
-          <el-form-item label="意向区域">
+          <el-form-item label="面积">
+            <el-input-number lable="最小面积" v-model="temp.minArea"></el-input-number>
+            <el-input-number lable="最大面积" v-model="temp.maxArea"></el-input-number>
           </el-form-item>
         </div>
         <div v-show="stepQuery.step == 3">
-          3
+          <el-form-item label="礼貌用语">
+            <el-switch v-model="temp.isCourtesy"></el-switch>
+          </el-form-item>
+          <el-form-item :label="temp.isNewprop ? '耐心解答':'房源信息'">
+            <el-switch v-model="temp.isPatienty"></el-switch>
+          </el-form-item>
+          <el-form-item label="邀约到访">
+            <el-switch v-model="temp.isInvitation"></el-switch>
+          </el-form-item>
+          <el-form-item :label="temp.isNewprop ? '项目转介':'约看成功'">
+            <el-switch v-model="temp.isTransfer"></el-switch>
+          </el-form-item>
+          <el-form-item label="评分">
+            <el-rate style="margin-top:8px;" show-score v-model="temp.score" :colors="['#99A9BF', '#F7BA2A', '#FF9900']"></el-rate>
+          </el-form-item>
+           <el-form-item label="备注信息">
+            <el-input v-model="temp.remark" style="width:400px;" :rows="3" placeholder="单价" type="textarea"></el-input>
+          </el-form-item>
         </div>
       </el-form>
+      {{temp.isConnected}}
       <div slot="footer" class="dialog-footer">
         <el-button @click="handlePreStep" v-show="stepQuery.preStep">上一步</el-button>
         <el-button @click="handleNextStep" v-show="stepQuery.nextStep">下一步</el-button>
+
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button v-show="stepQuery.step == 3" type="primary" @click="updateData">确 定</el-button>
       </div>
@@ -149,23 +179,6 @@ import { fetchList } from "@/api/callrecord";
 import waves from "@/directive/waves"; // 水波纹指令
 import { parseTime } from "@/utils";
 import VueAudio from "@/components/Audio";
-
-// const tradeOptions = [
-//   { key: 1, name: "新房", value: "新" },
-//   { key: 2, name: "出售", value: "售" },
-//   { key: 3, name: "出租", value: "租" }
-// ];
-
-// const sourceOptions = [
-//   { key: 1, name: "新房", value: "Newprop" },
-//   { key: 2, name: "二手房", value: "esf" }
-// ];
-
-// // arr to obj ,such as { CN : "中国", US : "美国" }
-// const tardeTypeKeyValue = tradeOptions.reduce((acc, cur) => {
-//   acc[cur.value] = cur.name;
-//   return acc;
-// }, {});
 
 export default {
   name: "calledlist",
@@ -182,13 +195,47 @@ export default {
       list: null,
       total: null,
       listLoading: true,
+      dateRange: "",
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            }
+          },
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            }
+          },
+          {
+            text: "最近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            }
+          }
+        ]
+      },
       listQuery: {
         page: 1,
         limit: 10,
         iscentaline: null,
         type: undefined,
         isnewprop: null,
-        calledStatus: 0
+        calledStatus: 0,
+        beginTime: "",
+        endTime: ""
       },
       tradeOptions: [
         {
@@ -226,10 +273,10 @@ export default {
           name: "未接通"
         }
       ],
-      showAuditor: false,
+      importanceOptions: [1, 2, 3],
       temp: {
         id: undefined,
-        isConnected: true,
+        isConnected: false,
         isEffective: true,
         propertyType: 1,
         intentionArea: null,
@@ -241,9 +288,10 @@ export default {
         isPatienty: false,
         isInvitation: false,
         isTransfer: false,
-        CalledStatus: 0,
+        score: null,
+        calledStatus: 0,
         timestamp: new Date(),
-        audioStr: ""
+        playing: false
       },
       stepQuery: {
         step: 1,
@@ -287,8 +335,22 @@ export default {
   created() {
     this.getList();
   },
+  computed: {
+    audioStr: function() {
+      return (
+        "http://10.4.18.13/RecordingDownLoad.aspx?userid=" +
+        this.temp.calledNo +
+        "&id=" +
+        this.temp.callId
+      );
+    }
+  },
   methods: {
     getList() {
+      if (this.dateRange !== "") {
+        this.listQuery.beginTime = this.dateRange[0];
+        this.listQuery.endTime = this.dateRange[1];
+      }
       this.listLoading = true;
       fetchList(this.listQuery).then(response => {
         this.list = response.data.data.items;
@@ -304,7 +366,6 @@ export default {
       this.stepQuery.step++;
       this.goStep(this.stepQuery.step);
     },
-    getAudioUrl() {},
     goStep: function(n) {
       switch (n) {
         case 1:
@@ -342,17 +403,8 @@ export default {
     },
     handleUpdate(row) {
       this.resetStepQuery();
-
       this.temp = Object.assign({}, row); // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp);
-
-      this.temp.audioStr =
-        "http://10.4.18.13/RecordingDownLoad.aspx?userid=" +
-        this.temp.calledNo +
-        "&id=" +
-        this.temp.callId;
-
-      console.log(this.temp.audioStr);
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
@@ -376,6 +428,9 @@ export default {
       });
       const index = this.list.indexOf(row);
       this.list.splice(index, 1);
+    },
+    handleDialogClose() {
+      this.temp.playing = false;
     },
     handleDownload() {
       require.ensure([], () => {

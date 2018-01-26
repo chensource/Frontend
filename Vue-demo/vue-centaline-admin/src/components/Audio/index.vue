@@ -10,10 +10,10 @@
             @timeupdate="onTimeupdate"
             @loadedmetadata="onLoadedmetadata"
     ></audio>
-    <div>
+    <div v-if="!theError">
       <el-button type="text" @click="startPlayOrPause">
-        <svg-icon :icon-class="audio.playing ? 'pause':'player'" />
-        {{ audio.playing | transPlayPause }}
+        <svg-icon :icon-class="thePlaying ? 'pause':'player'" />
+        {{ thePlaying | transPlayPause }}
       </el-button>
       <el-button v-show="!controlList.noSpeed" type="text" @click="changeSpeed">{{audio.speed | transSpeed}}</el-button>
       <el-tag type="info">{{ audio.currentTime | formatSecond}}</el-tag>
@@ -23,6 +23,7 @@
       <el-slider v-show="!controlList.noVolume" v-model="volume" :format-tooltip="formatVolumeToolTip" @change="changeVolume" class="slider"></el-slider>
       <a :href="url" v-show="!controlList.noDownload" target="_blank" class="download" download>下载</a>
     </div>
+    <div v-else>暂无录音</div>
   </div>
 </template>
 
@@ -44,6 +45,7 @@ function realFormatSecond(second) {
 }
 
 export default {
+  name: "VueAudio",
   props: {
     theUrl: {
       type: String,
@@ -58,18 +60,22 @@ export default {
     theControlList: {
       type: String,
       default: ""
+    },
+    theError: {
+      type: Boolean,
+      default: false
+    },
+    thePlaying: {
+      type: Boolean,
+      default: false
     }
   },
-  name: "VueAudio",
   data() {
     return {
-      url:
-        this.theUrl ||
-        "http://10.4.18.13/RecordingDownLoad.aspx?userid=KFS02783080099&id=1840533",
+      url: this.theUrl || "",
       audio: {
         currentTime: 0,
         maxTime: 0,
-        playing: false,
         muted: false,
         speed: 1,
         waiting: true,
@@ -90,7 +96,7 @@ export default {
         // 只能播放一个
         onlyOnePlaying: false,
         // 不要快进按钮
-        noSpeed: false
+        noSpeed: true
       }
     };
   },
@@ -102,7 +108,6 @@ export default {
           this.controlList[item] = true;
         }
       });
-      console.log(this.url);
     },
     changeSpeed() {
       const index = this.speeds.indexOf(this.audio.speed) + 1;
@@ -132,7 +137,7 @@ export default {
       this.$refs.audio.currentTime = parseInt(index / 100 * this.audio.maxTime);
     },
     startPlayOrPause() {
-      return this.audio.playing ? this.pausePlay() : this.startPlay();
+      return this.thePlaying ? this.pausePlay() : this.startPlay();
     },
     // 开始播放
     startPlay() {
@@ -144,20 +149,20 @@ export default {
     },
     // 当音频暂停
     onPause() {
-      this.audio.playing = false;
+      this.thePlaying = false;
     },
     // 当发生错误, 就出现loading状态
     onError() {
-      this.audio.waiting = true;
+      this.theError = true;
+      this.audio.waiting = false;
     },
     // 当音频开始等待
     onWaiting(res) {
-      console.log(res);
+      // console.log(res);
     },
     // 当音频开始播放
     onPlay(res) {
-      console.log(res);
-      this.audio.playing = true;
+      this.thePlaying = true;
       this.audio.loading = false;
 
       if (!this.controlList.onlyOnePlaying) {
@@ -174,8 +179,6 @@ export default {
     },
     // 当timeupdate事件大概每秒一次，用来更新音频流的当前播放时间
     onTimeupdate(res) {
-      // console.log('timeupdate')
-      // console.log(res)
       this.audio.currentTime = res.target.currentTime;
       this.sliderTime = parseInt(
         this.audio.currentTime / this.audio.maxTime * 100
@@ -184,6 +187,7 @@ export default {
     // 当加载语音流元数据完成后，会触发该事件的回调函数
     // 语音元数据主要是语音的长度之类的数据
     onLoadedmetadata(res) {
+      // console.log(res);
       this.audio.waiting = false;
       this.audio.maxTime = parseInt(res.target.duration);
     }

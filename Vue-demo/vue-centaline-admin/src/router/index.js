@@ -134,9 +134,6 @@ export const asyncRouterMap = [
       component: _import('contract/table/index'),
       redirect: '/callrecord',
       name: 'Table',
-      meta: {
-        title: 'dealTable'
-      },
       children: [{
         path: 'callrecord-list',
         component: _import('callrecord/list'),
