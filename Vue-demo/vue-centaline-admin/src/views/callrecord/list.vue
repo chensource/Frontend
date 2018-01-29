@@ -73,10 +73,17 @@
           </el-tag>
         </template>
       </el-table-column>
-       <el-table-column min-width="70px"  align="center" label="公司来电">
+      <el-table-column min-width="70px"  align="center" label="公司来电">
         <template slot-scope="scope">
           <el-tag :type="scope.row.isCentaline | iconFilter">
             <span :class="scope.row.isCentaline?'el-icon-success':'el-icon-error'"></span>
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column min-width="70px"  align="center" label="是否评价">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.isEvaluation | iconFilter">
+            <span :class="scope.row.isEvaluation?'el-icon-success':'el-icon-error'"></span>
           </el-tag>
         </template>
       </el-table-column>
@@ -92,16 +99,16 @@
       </el-pagination>
     </div>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" @close="handleDialogClose()">
+    <el-dialog   :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" @close="handleDialogClose()">
       <el-steps :active="stepQuery.step" align-center finish-status="success">
         <el-step title="基本信息"></el-step>
         <el-step title="客户信息"></el-step>
         <el-step title="顾问评分"></el-step>
       </el-steps>
-      <el-form ref="dataForm" :model="temp" label-width="100px" label-position="left" style='width: 600px; margin:20px 0 0 70px;'>
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-width="100px" label-position="left" style='width: 600px; margin:20px 0 0 70px;'>
         <div v-show="stepQuery.step == 1">
           <el-form-item label="通话录音">
-            <VueAudio :theUrl="audioStr" :theError="false" :thePlaying="temp.playing" />
+            <VueAudio :theUrl="audioStr" :theError="false" :thePlaying="playing" />
           </el-form-item>
           <el-form-item label="来电项目">
             <span>{{ temp.calledMsg }}</span>
@@ -120,46 +127,56 @@
           </el-form-item>
         </div>
         <div v-show="stepQuery.step == 2">
-          <el-form-item label="是否接通">
-            <el-switch v-model="temp.isConnected"></el-switch>
+          <el-form-item label="是否接通" prop="isConnected" required>
+            <el-radio-group v-model="temp.isConnected" >
+              <el-radio label="true">是</el-radio>
+              <el-radio label="false">否</el-radio>
+            </el-radio-group>
           </el-form-item>
-          <el-form-item label="是否有效">
-            <el-switch v-model="temp.isEffective"></el-switch>
+          <el-form-item label="是否有效" prop="isEffective">
+            <el-radio-group v-model="temp.isEffective">
+              <el-radio label="true">是</el-radio>
+              <el-radio label="false">否</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="意向区域">
-            <el-input v-model="temp.intentionArea" placeholder="意向区域" style="width: 250px"></el-input>
+            <el-input v-model="temp.intentionArea" placeholder="意向区域" :disabled=" temp.isConnected === 'false'" style="width: 250px"></el-input>
           </el-form-item>
           <el-form-item label="物业类型">
-            <el-select clearable class="filter-item" style="width: 250px" multiple v-model="temp.propertyType" placeholder="物业类型">
+            <el-select clearable class="filter-item" style="width: 250px" v-model="temp.propertyType" placeholder="物业类型" :disabled=" temp.isConnected === 'false'">
               <el-option v-for="item in propertyTypeOptions" :key="item.key" :label="item.name" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="单价">
-            <el-input v-model="temp.unitPrice" placeholder="单价" style="width: 250px"></el-input>
+            <el-input-number v-model="temp.unitPrice" placeholder="单价" :disabled=" temp.isConnected === 'false'" style="width: 250px"></el-input-number>
           </el-form-item>
           <el-form-item label="面积">
-            <el-input-number lable="最小面积" v-model="temp.minArea"></el-input-number>
-            <el-input-number lable="最大面积" v-model="temp.maxArea"></el-input-number>
+            <el-input-number lable="最小面积" v-model="temp.minArea" :disabled=" temp.isConnected === 'false'">
+              {{ temp.isConnected === 'false' ? 0:50 }}
+            </el-input-number>
+            <el-input-number lable="最大面积" :min="60" :max='500' v-model="temp.maxArea" :disabled=" temp.isConnected === 'false'">
+              {{ temp.isConnected === 'false' ? 0:50 }}
+            </el-input-number>
           </el-form-item>
         </div>
         <div v-show="stepQuery.step == 3">
-          <el-form-item label="礼貌用语">
+          <el-form-item label="礼貌用语" :disabled=" temp.isConnected === 'false'">
             <el-switch v-model="temp.isCourtesy"></el-switch>
           </el-form-item>
-          <el-form-item :label="temp.isNewprop ? '耐心解答':'房源信息'">
+          <el-form-item :label="temp.isNewprop ? '耐心解答':'房源信息'" :disabled=" temp.isConnected === 'false'">
             <el-switch v-model="temp.isPatienty"></el-switch>
           </el-form-item>
-          <el-form-item label="邀约到访">
+          <el-form-item label="邀约到访" :disabled=" temp.isConnected === 'false'">
             <el-switch v-model="temp.isInvitation"></el-switch>
           </el-form-item>
-          <el-form-item :label="temp.isNewprop ? '项目转介':'约看成功'">
+          <el-form-item :label="temp.isTransfer ? '项目转介':'约看成功'" :disabled=" temp.isConnected === 'false'">
             <el-switch v-model="temp.isTransfer"></el-switch>
           </el-form-item>
-          <el-form-item label="评分">
+          <el-form-item label="评分" :disabled=" temp.isConnected === 'false'">
             <el-rate style="margin-top:8px;" show-score v-model="temp.score" :colors="['#99A9BF', '#F7BA2A', '#FF9900']"></el-rate>
           </el-form-item>
-           <el-form-item label="备注信息">
+           <el-form-item label="备注信息" :disabled=" temp.isConnected === 'false'">
             <el-input v-model="temp.remark" style="width:400px;" :rows="3" placeholder="单价" type="textarea"></el-input>
           </el-form-item>
         </div>
@@ -192,12 +209,12 @@ export default {
   },
   data() {
     return {
-      datetimes: "",
       tableKey: 0,
       list: null,
       total: null,
       listLoading: true,
       dateRange: "",
+      playing: false,
       listQuery: {
         page: 1,
         limit: 10,
@@ -285,7 +302,7 @@ export default {
       ],
       temp: {
         callId: undefined,
-        isConnected: false,
+        isConnected: null,
         isEffective: true,
         propertyType: null,
         intentionArea: null,
@@ -300,8 +317,7 @@ export default {
         score: null,
         calledStatus: 0,
         timestamp: new Date(),
-        playing: false
-        // username: store.getters.name
+        employeeNo: this.$store.state.user.name
       },
       stepQuery: {
         step: 1,
@@ -313,6 +329,14 @@ export default {
       textMap: {
         update: "编辑",
         create: "创建"
+      },
+      rules: {
+        isConnected: [
+          { required: true, message: "请选择是否接通", trigger: "change" }
+        ],
+        isEffective: [
+          { required: true, message: "请选择是否有效", trigger: "change" }
+        ]
       }
     };
   },
@@ -348,6 +372,7 @@ export default {
         this.listQuery.beginTime = "";
         this.listQuery.endTime = "";
       }
+
       fetchList(this.listQuery).then(response => {
         this.list = response.data.data.items;
         this.total = response.data.data.total;
@@ -359,8 +384,17 @@ export default {
       this.goStep(this.stepQuery.step);
     },
     handleNextStep() {
-      this.stepQuery.step++;
-      this.goStep(this.stepQuery.step);
+      if (this.stepQuery.step === 2) {
+        this.$refs["dataForm"].validate(valid => {
+          if (valid) {
+            this.stepQuery.step++;
+            this.goStep(this.stepQuery.step);
+          }
+        });
+      } else {
+        this.stepQuery.step++;
+        this.goStep(this.stepQuery.step);
+      }
     },
     goStep: function(n) {
       switch (n) {
@@ -392,7 +426,6 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
@@ -400,17 +433,19 @@ export default {
       });
     },
     createData() {
-      console.log(this.temp);
-      create(this.temp).then(response => {
-        // this.list.unshift(this.temp);
-        var data = response.data;
-        if (data.meta.code === 0) {
-          this.dialogFormVisible = false;
-          this.$notify({
-            title: "成功",
-            message: "创建成功",
-            type: "success",
-            duration: 2000
+      this.$refs["dataForm"].validate(valid => {
+        if (valid) {
+          create(this.temp).then(response => {
+            var data = response.data;
+            if (data.meta.code === 0) {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "成功",
+                message: "创建成功",
+                type: "success",
+                duration: 2000
+              });
+            }
           });
         }
       });
@@ -424,7 +459,7 @@ export default {
     },
     handleDialogClose() {
       this.resetStepQuery();
-      this.temp.playing = false;
+      this.playing = false;
     },
     handleDownload() {
       require.ensure([], () => {
