@@ -1,6 +1,18 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
+      <el-date-picker class="filter-item"
+        v-model="dateRange"
+        type="daterange"
+        range-separator="-"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        :picker-options="pickerOptions"
+        unlink-panels
+        default-value="2010-10-01"
+        value-format="yyyy-MM-dd"
+      >
+      </el-date-picker>
       <el-select clearable class="filter-item" style="width: 120px" v-model="listQuery.isnewprop" placeholder="类型">
         <el-option v-for="item in sourceOptions" :key="item.key" :label="item.name" :value="item.value">
         </el-option>
@@ -13,17 +25,6 @@
         <el-option v-for="item in calledStatusOptions" :key="item.key" :label="item.name" :value="item.value">
         </el-option>
       </el-select>
-      <el-date-picker class="filter-item"
-        v-model="dateRange"
-        type="daterange"
-        range-separator="-"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        :picker-options="pickerOptions"
-        unlink-panels
-        value-format="yyyy-MM-dd"
-      >
-      </el-date-picker>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
@@ -65,18 +66,17 @@
           <span>{{ scope.row.createTime | parseTime('{y}-{m}-{d}')}}</span>
         </template>
       </el-table-column>
-      <el-table-column min-width="70px"  align="center" label="新房来电">
+      <el-table-column min-width="70px"  align="center" label="来电类型">
         <template slot-scope="scope">
           <el-tag :type="scope.row.isNewprop |  iconFilter">
-            <i v-if="scope.row.isNewprop" class="el-icon-success"></i>
-            <i v-else class="el-icon-error"></i>
+            <span>{{ scope.row.isNewprop ? '新房' : '二手房' }}</span>
           </el-tag>
         </template>
       </el-table-column>
        <el-table-column min-width="70px"  align="center" label="公司来电">
         <template slot-scope="scope">
           <el-tag :type="scope.row.isCentaline | iconFilter">
-            <i :class="scope.row.isCentaline?'el-icon-success':'el-icon-error'"></i>
+            <span :class="scope.row.isCentaline?'el-icon-success':'el-icon-error'"></span>
           </el-tag>
         </template>
       </el-table-column>
@@ -98,7 +98,7 @@
         <el-step title="客户信息"></el-step>
         <el-step title="顾问评分"></el-step>
       </el-steps>
-      <el-form :rules="rules" ref="dataForm" :model="temp" label-width="100px" label-position="left" style='width: 600px; margin:20px 0 0 70px;'>
+      <el-form ref="dataForm" :model="temp" label-width="100px" label-position="left" style='width: 600px; margin:20px 0 0 70px;'>
         <div v-show="stepQuery.step == 1">
           <el-form-item label="通话录音">
             <VueAudio :theUrl="audioStr" :theError="false" :thePlaying="temp.playing" />
@@ -126,14 +126,17 @@
           <el-form-item label="是否有效">
             <el-switch v-model="temp.isEffective"></el-switch>
           </el-form-item>
+          <el-form-item label="意向区域">
+            <el-input v-model="temp.intentionArea" placeholder="意向区域" style="width: 250px"></el-input>
+          </el-form-item>
           <el-form-item label="物业类型">
-            <el-select clearable class="filter-item" style="width: 130px" v-model="listQuery.iscentaline" placeholder="物业类型">
-              <el-option v-for="item in tradeOptions" :key="item.key" :label="item.name" :value="item.value">
+            <el-select clearable class="filter-item" style="width: 250px" multiple v-model="temp.propertyType" placeholder="物业类型">
+              <el-option v-for="item in propertyTypeOptions" :key="item.key" :label="item.name" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="单价">
-            <el-input v-model="temp.unitPrice" placeholder="单价" style="width: 130px"></el-input>
+            <el-input v-model="temp.unitPrice" placeholder="单价" style="width: 250px"></el-input>
           </el-form-item>
           <el-form-item label="面积">
             <el-input-number lable="最小面积" v-model="temp.minArea"></el-input-number>
@@ -161,20 +164,19 @@
           </el-form-item>
         </div>
       </el-form>
-      {{temp.isConnected}}
       <div slot="footer" class="dialog-footer">
         <el-button @click="handlePreStep" v-show="stepQuery.preStep">上一步</el-button>
         <el-button @click="handleNextStep" v-show="stepQuery.nextStep">下一步</el-button>
-
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button v-show="stepQuery.step == 3" type="primary" @click="updateData">确 定</el-button>
+        <el-button v-show="stepQuery.step == 3" type="primary" @click="createData">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList } from "@/api/callrecord";
+import { fetchList, create } from "@/api/callrecord";
+// import store from "./store";
 
 import waves from "@/directive/waves"; // 水波纹指令
 import { parseTime } from "@/utils";
@@ -196,6 +198,16 @@ export default {
       total: null,
       listLoading: true,
       dateRange: "",
+      listQuery: {
+        page: 1,
+        limit: 10,
+        iscentaline: null,
+        type: undefined,
+        isnewprop: null,
+        calledStatus: 0,
+        beginTime: "",
+        endTime: ""
+      },
       pickerOptions: {
         shortcuts: [
           {
@@ -226,16 +238,6 @@ export default {
             }
           }
         ]
-      },
-      listQuery: {
-        page: 1,
-        limit: 10,
-        iscentaline: null,
-        type: undefined,
-        isnewprop: null,
-        calledStatus: 0,
-        beginTime: "",
-        endTime: ""
       },
       tradeOptions: [
         {
@@ -274,11 +276,18 @@ export default {
         }
       ],
       importanceOptions: [1, 2, 3],
+      propertyTypeOptions: [
+        { keyid: 1, value: "住宅", name: "住宅" },
+        { keyid: 2, value: "商铺", name: "商铺" },
+        { keyid: 3, value: "公寓", name: "公寓" },
+        { keyid: 4, value: "写字楼", name: "写字楼" },
+        { keyid: 5, value: "其他", name: "其他" }
+      ],
       temp: {
-        id: undefined,
+        callId: undefined,
         isConnected: false,
         isEffective: true,
-        propertyType: 1,
+        propertyType: null,
         intentionArea: null,
         unitPrice: null,
         minArea: null,
@@ -292,6 +301,7 @@ export default {
         calledStatus: 0,
         timestamp: new Date(),
         playing: false
+        // username: store.getters.name
       },
       stepQuery: {
         step: 1,
@@ -303,23 +313,6 @@ export default {
       textMap: {
         update: "编辑",
         create: "创建"
-      },
-      dialogPvVisible: false,
-      rules: {
-        type: [
-          { required: true, message: "type is required", trigger: "change" }
-        ],
-        timestamp: [
-          {
-            type: "date",
-            required: true,
-            message: "timestamp is required",
-            trigger: "change"
-          }
-        ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" }
-        ]
       }
     };
   },
@@ -347,11 +340,14 @@ export default {
   },
   methods: {
     getList() {
-      if (this.dateRange !== "") {
+      this.listLoading = true;
+      if (this.dateRange !== "" && this.dateRange !== null) {
         this.listQuery.beginTime = this.dateRange[0];
         this.listQuery.endTime = this.dateRange[1];
+      } else {
+        this.listQuery.beginTime = "";
+        this.listQuery.endTime = "";
       }
-      this.listLoading = true;
       fetchList(this.listQuery).then(response => {
         this.list = response.data.data.items;
         this.total = response.data.data.total;
@@ -394,15 +390,7 @@ export default {
       this.listQuery.page = val;
       this.getList();
     },
-    resetStepQuery() {
-      this.stepQuery = {
-        step: 1,
-        preStep: false,
-        nextStep: true
-      };
-    },
     handleUpdate(row) {
-      this.resetStepQuery();
       this.temp = Object.assign({}, row); // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = "update";
@@ -411,25 +399,31 @@ export default {
         this.$refs["dataForm"].clearValidate();
       });
     },
-    updateData() {
-      this.$refs["dataForm"].validate(valid => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+    createData() {
+      console.log(this.temp);
+      create(this.temp).then(response => {
+        // this.list.unshift(this.temp);
+        var data = response.data;
+        if (data.meta.code === 0) {
+          this.dialogFormVisible = false;
+          this.$notify({
+            title: "成功",
+            message: "创建成功",
+            type: "success",
+            duration: 2000
+          });
         }
       });
     },
-    handleDelete(row) {
-      this.$notify({
-        title: "成功",
-        message: "删除成功",
-        type: "success",
-        duration: 2000
-      });
-      const index = this.list.indexOf(row);
-      this.list.splice(index, 1);
+    resetStepQuery() {
+      this.stepQuery = {
+        step: 1,
+        preStep: false,
+        nextStep: true
+      };
     },
     handleDialogClose() {
+      this.resetStepQuery();
       this.temp.playing = false;
     },
     handleDownload() {

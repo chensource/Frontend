@@ -7,3 +7,11 @@ export function fetchList(query) {
     params: query
   });
 }
+
+export function create(data) {
+  return request({
+    url: '/callrecord/create',
+    method: 'post',
+    data
+  });
+}
