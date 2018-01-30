@@ -26,7 +26,7 @@
         </el-option>
       </el-select>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
-      <el-button class="filter-item" type="primary" v-waves icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <el-button class="filter-item" type="primary" v-waves icon="el-icon-download" @click="handleDownload" :disabled="true">导出</el-button>
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
@@ -41,12 +41,12 @@
            <span>{{scope.row.callId}}</span>
         </template>
       </el-table-column>
-      <el-table-column min-width="220px" align="center" label="来电项目">
+      <el-table-column min-width="180px" align="center" label="来电项目">
         <template slot-scope="scope">
           <span>{{ scope.row.calledMsg }}</span>
         </template>
       </el-table-column>
-      <el-table-column min-width="150px" align="center" label="接听人工号">
+      <el-table-column min-width="140px" align="center" label="接听人工号">
         <template slot-scope="scope">
           <span>{{ scope.row.calledNo }}</span>
         </template>
@@ -61,7 +61,7 @@
           <span>{{ scope.row.called }}</span>
         </template>
       </el-table-column>
-      <el-table-column min-width="100px" align="center" label="来电时间">
+      <el-table-column min-width="90px" align="center" label="来电时间">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime | parseTime('{y}-{m}-{d}')}}</span>
         </template>
@@ -87,9 +87,9 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="0" class-name="small-padding">
+      <el-table-column align="center" label="操作" class-name="small-padding">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button type="primary" size="mini" :disabled="scope.row.isEvaluation || scope.row.calledStatus !== 0" @click="handleUpdate(scope.row)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -316,8 +316,7 @@ export default {
         isTransfer: false,
         score: null,
         calledStatus: 0,
-        timestamp: new Date(),
-        employeeNo: this.$store.state.user.name
+        timestamp: new Date()
       },
       stepQuery: {
         step: 1,
@@ -441,11 +440,12 @@ export default {
               this.dialogFormVisible = false;
               this.$notify({
                 title: "成功",
-                message: "创建成功",
+                message: "添加成功",
                 type: "success",
                 duration: 2000
               });
             }
+            this.getList();
           });
         }
       });

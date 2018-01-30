@@ -67,8 +67,8 @@ export default {
 
     return {
       loginForm: {
-        username: "chenshi3",
-        password: "Chens1204."
+        username: "",
+        password: ""
       },
       loginRules: {
         password: [
@@ -216,4 +216,3 @@ $light_gray: #eee;
   }
 }
 </style>
-

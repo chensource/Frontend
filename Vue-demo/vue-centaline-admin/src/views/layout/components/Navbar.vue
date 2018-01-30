@@ -1,29 +1,25 @@
 <template>
   <el-menu class="navbar" mode="horizontal">
     <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
-
     <breadcrumb class="breadcrumb-container"></breadcrumb>
-
     <div class="right-menu">
       <error-log v-if="errorLogs.length>0" class="errLog-container right-menu-item" :logsList="errorLogs"></error-log>
-
-      <el-dropdown class="avatar-container right-menu-item" trigger="click">
-        <span class="el-dropdown-link">{{name}}</span>
-        <span class="el-dropdown-link" @click="logout" style="display:block;">退出登录</span>
-
-        <el-dropdown-menu slot="dropdown">
-          <router-link to="/">
+     	<el-dropdown class="avatar-container" trigger="click">
+        <div class="avatar-wrapper">
+          <span>{{name}}</span>
+          <i class="el-icon-caret-bottom"></i>
+        </div>
+        <el-dropdown-menu class="user-dropdown" slot="dropdown">
+          <router-link class='inlineBlock' to="/">
             <el-dropdown-item>
               首页
             </el-dropdown-item>
           </router-link>
-          <a target='_blank' href="https://github.com/PanJiaChen/vue-element-admin/">
             <el-dropdown-item>
-              项目地址
+              <span @click="logout" style="display:block;">退出登录</span>
             </el-dropdown-item>
-          </a>
         </el-dropdown-menu>
-      </el-dropdown>
+		  </el-dropdown>
     </div>
   </el-menu>
 </template>
@@ -56,7 +52,7 @@ export default {
       });
     },
     logout() {
-      this.$store.dispatch("LogOut").then(() => {
+      this.$store.dispatch("FedLogOut").then(() => {
         location.reload(); // 为了重新实例化vue-router对象 避免bug
       });
     }
@@ -92,9 +88,7 @@ export default {
       display: inline-block;
       margin: 0 8px;
     }
-    .screenfull {
-      height: 20px;
-    }
+
     .international {
       vertical-align: top;
       .international-icon {
@@ -108,10 +102,10 @@ export default {
     }
     .avatar-container {
       height: 50px;
-      margin-right: 30px;
+      margin-right: 50px;
       .avatar-wrapper {
         cursor: pointer;
-        margin-top: 5px;
+        margin-top: 0px;
         position: relative;
         .user-avatar {
           width: 40px;
@@ -121,7 +115,7 @@ export default {
         .el-icon-caret-bottom {
           position: absolute;
           right: -20px;
-          top: 25px;
+          top: 18px;
           font-size: 12px;
         }
       }
