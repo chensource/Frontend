@@ -1,7 +1,7 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <el-date-picker class="filter-item"
+      <el-date-picker  class="filter-item"
         v-model="dateRange"
         type="daterange"
         range-separator="-"
@@ -9,7 +9,6 @@
         end-placeholder="结束日期"
         :picker-options="pickerOptions"
         unlink-panels
-        default-value="2010-10-01"
         value-format="yyyy-MM-dd"
       >
       </el-date-picker>
@@ -41,22 +40,22 @@
            <span>{{scope.row.callId}}</span>
         </template>
       </el-table-column>
-      <el-table-column min-width="180px" align="center" label="来电项目">
+      <el-table-column min-width="160px" align="center" label="来电项目">
         <template slot-scope="scope">
           <span>{{ scope.row.calledMsg }}</span>
         </template>
       </el-table-column>
-      <el-table-column min-width="140px" align="center" label="接听人工号">
+      <el-table-column min-width="130px" align="center" label="接听人工号">
         <template slot-scope="scope">
           <span>{{ scope.row.calledNo }}</span>
         </template>
       </el-table-column>
-      <el-table-column min-width="150px" align="center" label="接听人姓名">
+      <el-table-column min-width="110px" align="center" label="接听人姓名">
         <template slot-scope="scope">
           <span>{{ scope.row.calledName }}</span>
         </template>
       </el-table-column>
-      <el-table-column min-width="120px" align="center" label="接听人电话">
+      <el-table-column min-width="110px" align="center" label="接听人电话">
         <template slot-scope="scope">
           <span>{{ scope.row.called }}</span>
         </template>
@@ -85,6 +84,11 @@
           <el-tag :type="scope.row.isEvaluation | iconFilter">
             <span :class="scope.row.isEvaluation?'el-icon-success':'el-icon-error'"></span>
           </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column min-width="70px"  align="center" label="评价人">
+        <template slot-scope="scope">
+            <span>{{scope.row.createEmployeeName ? scope.row.createEmployeeName:'-'}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" class-name="small-padding">
@@ -226,6 +230,12 @@ export default {
         endTime: ""
       },
       pickerOptions: {
+        disabledDate: time => {
+          const endDateVal = this.listQuery.endTime;
+          if (endDateVal) {
+            return time.getTime() > endDateVal;
+          }
+        },
         shortcuts: [
           {
             text: "最近一周",
@@ -349,6 +359,10 @@ export default {
     }
   },
   created() {
+    const endtime = new Date();
+    const start = new Date();
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+    this.dateRange = [start, endtime];
     this.getList();
   },
   computed: {
@@ -364,13 +378,8 @@ export default {
   methods: {
     getList() {
       this.listLoading = true;
-      if (this.dateRange !== "" && this.dateRange !== null) {
-        this.listQuery.beginTime = this.dateRange[0];
-        this.listQuery.endTime = this.dateRange[1];
-      } else {
-        this.listQuery.beginTime = "";
-        this.listQuery.endTime = "";
-      }
+      this.listQuery.beginTime = this.dateRange[0];
+      this.listQuery.endTime = this.dateRange[1];
 
       fetchList(this.listQuery).then(response => {
         this.list = response.data.data.items;
@@ -446,6 +455,7 @@ export default {
               });
             }
             this.getList();
+            this.resetStepQuery();
           });
         }
       });
@@ -456,10 +466,10 @@ export default {
         preStep: false,
         nextStep: true
       };
+      this.playing = false;
     },
     handleDialogClose() {
       this.resetStepQuery();
-      this.playing = false;
     },
     handleDownload() {
       require.ensure([], () => {
