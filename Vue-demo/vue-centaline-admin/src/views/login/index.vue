@@ -17,12 +17,10 @@
         <el-input name="password" :type="pwdType" v-model="loginForm.password" @keyup.enter.native='handleLogin' placeholder="密码">
         </el-input>
         <span class="show-pwd" @click="showPwd">
-          <svg-icon icon-class="eye"></svg-icon>
+          <svg-icon :icon-class=" pwdType ? 'eye-off':'eye'"></svg-icon>
         </span>
       </el-form-item>
-
       <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent='handleLogin'>登陆</el-button>
-
       <!-- <el-button class="thirdparty-button" type="primary" @click="showDialog=true">打开第三方登录</el-button> -->
     </el-form>
     <el-dialog title="第三方验证" :visible.sync="showDialog">
