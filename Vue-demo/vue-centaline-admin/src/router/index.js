@@ -1,13 +1,13 @@
-import Vue from 'vue';
-import Router from 'vue-router';
-const _import = require('./_import_' + process.env.NODE_ENV);
+import Vue from "vue";
+import Router from "vue-router";
+const _import = require("./_import_" + process.env.NODE_ENV);
 // in development-env not use lazy-loading, because lazy-loading too many pages will cause webpack hot update too slow. so only in production use lazy-loading;
 // detail: https://panjiachen.github.io/vue-element-admin-site/#/lazy-loading
 
 Vue.use(Router);
 
 /* Layout */
-import Layout from '../views/layout/Layout';
+import Layout from "../views/layout/Layout";
 
 /**
 * hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
@@ -20,57 +20,62 @@ import Layout from '../views/layout/Layout';
     noCache: true                if fasle ,the page will no be cached(default is false)
   }
 **/
-export const constantRouterMap = [{
-  path: '/login',
-  component: _import('login/index'),
-  hidden: true
-},
-{
-  path: '/authredirect',
-  component: _import('login/authredirect'),
-  hidden: true
-},
-{
-  path: '/404',
-  component: _import('errorPage/404'),
-  hidden: true
-},
-{
-  path: '/401',
-  component: _import('errorPage/401'),
-  hidden: true
-},
-{
-  path: '',
-  component: Layout,
-  redirect: 'dashboard',
-  children: [{
-    path: 'dashboard',
-    component: _import('dashboard/index'),
-    name: 'dashboard',
-    meta: {
-      title: 'dashboard',
-      icon: 'dashboard',
-      noCache: true
-    }
-  }]
-},
-{
-  path: '/documentation',
-  component: Layout,
-  redirect: '/documentation/index',
-  hidden: true,
-  children: [{
-    path: 'index',
-    component: _import('documentation/index'),
-    name: 'documentation',
-    meta: {
-      title: 'documentation',
-      icon: 'documentation',
-      noCache: true
-    }
-  }]
-}
+export const constantRouterMap = [
+  {
+    path: "/login",
+    component: _import("login/index"),
+    hidden: true
+  },
+  {
+    path: "/authredirect",
+    component: _import("login/authredirect"),
+    hidden: true
+  },
+  {
+    path: "/404",
+    component: _import("errorPage/404"),
+    hidden: true
+  },
+  {
+    path: "/401",
+    component: _import("errorPage/401"),
+    hidden: true
+  },
+  {
+    path: "",
+    component: Layout,
+    redirect: "dashboard",
+    children: [
+      {
+        path: "dashboard",
+        component: _import("dashboard/index"),
+        name: "dashboard",
+        meta: {
+          title: "dashboard",
+          icon: "dashboard",
+          noCache: true
+        }
+      }
+    ]
+  },
+  {
+    path: "/documentation",
+    component: Layout,
+    redirect: "/documentation/index",
+    hidden: true,
+    children: [
+      {
+        path: "index",
+        component: _import("documentation/index"),
+        name: "documentation",
+        meta: {
+          title: "documentation",
+          icon: "documentation",
+          noCache: true
+        }
+      }
+    ]
+  }
 ];
 
 export default new Router({
@@ -121,61 +126,67 @@ export const asyncRouterMap = [
   //   ]
   // },
   {
-    path: '/callrecord',
+    path: "/callrecord",
     component: Layout,
-    redirect: '/callrecord/list',
-    name: 'callrecord',
+    redirect: "/callrecord/list",
+    name: "callrecord",
     meta: {
-      title: 'callrecord',
-      icon: 'tell'
+      title: "callrecord",
+      icon: "tell"
     },
-    children: [{
-      path: '/contract/list',
-      component: _import('contract/table/index'),
-      redirect: '/callrecord',
-      name: 'Table',
-      children: [{
-        path: 'callrecord-list',
-        component: _import('callrecord/list'),
-        name: 'callrecord-list',
-        meta: {
-          title: 'callrecordlist'
-        }
-      }]
-    }]
+    children: [
+      {
+        path: "/contract/list",
+        component: _import("contract/table/index"),
+        redirect: "/callrecord",
+        name: "Table",
+        children: [
+          {
+            path: "callrecord-list",
+            component: _import("callrecord/list"),
+            name: "callrecord-list",
+            meta: {
+              title: "callrecordlist"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
-    path: '/contract',
+    path: "/contract",
     component: Layout,
-    redirect: '/contract/table/deal-tabel',
-    name: 'contract',
+    redirect: "/contract/table/deal-tabel",
+    name: "contract",
     meta: {
-      title: 'deal',
-      icon: 'money'
+      title: "deal",
+      icon: "money"
     },
     hidden: true,
-    children: [{
-      path: '/contract/table',
-      component: _import('contract/table/index'),
-      redirect: '/contract/table/deal-table',
-      name: 'Table',
-      meta: {
-        title: 'dealTable'
-      },
-      children: [
-        // { path: 'dynamic-table', component: _import('contract/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: 'dynamicTable' }},
-        // { path: 'drag-table', component: _import('contract/table/dragTable'), name: 'dragTable', meta: { title: 'dragTable' }},
-        // { path: 'inline-edit-table', component: _import('contract/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'inlineEditTable' }},
-        {
-          path: 'deal-table',
-          component: _import('contract/table/dealTable'),
-          name: 'dealTable',
-          meta: {
-            title: 'deallist'
+    children: [
+      {
+        path: "/contract/table",
+        component: _import("contract/table/index"),
+        redirect: "/contract/table/deal-table",
+        name: "Table",
+        meta: {
+          title: "dealTable"
+        },
+        children: [
+          // { path: 'dynamic-table', component: _import('contract/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: 'dynamicTable' }},
+          // { path: 'drag-table', component: _import('contract/table/dragTable'), name: 'dragTable', meta: { title: 'dragTable' }},
+          // { path: 'inline-edit-table', component: _import('contract/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'inlineEditTable' }},
+          {
+            path: "deal-table",
+            component: _import("contract/table/dealTable"),
+            name: "dealTable",
+            meta: {
+              title: "deallist"
+            }
           }
-        }
-      ]
-    }]
+        ]
+      }
+    ]
   },
   // {
   //   path: '/form',
@@ -193,53 +204,56 @@ export const asyncRouterMap = [
   // },
 
   {
-    path: '/error',
+    path: "/error",
     component: Layout,
-    redirect: 'noredirect',
-    name: 'errorPages',
+    redirect: "noredirect",
+    name: "errorPages",
     meta: {
-      title: 'errorPages',
-      icon: '404'
+      title: "errorPages",
+      icon: "404"
     },
-    children: [{
-      path: '401',
-      component: _import('errorPage/401'),
-      name: 'page401',
-      meta: {
-        title: 'page401',
-        noCache: true
+    children: [
+      {
+        path: "401",
+        component: _import("errorPage/401"),
+        name: "page401",
+        meta: {
+          title: "page401",
+          noCache: true
+        }
+      },
+      {
+        path: "404",
+        component: _import("errorPage/404"),
+        name: "page404",
+        meta: {
+          title: "page404",
+          noCache: true
+        }
       }
-    },
-    {
-      path: '404',
-      component: _import('errorPage/404'),
-      name: 'page404',
-      meta: {
-        title: 'page404',
-        noCache: true
-      }
-    }
     ]
   },
 
   {
-    path: '/error-log',
+    path: "/error-log",
     component: Layout,
-    redirect: 'noredirect',
-    children: [{
-      path: 'log',
-      component: _import('errorLog/index'),
-      name: 'errorLog',
-      meta: {
-        title: 'errorLog',
-        icon: 'bug'
+    redirect: "noredirect",
+    children: [
+      {
+        path: "log",
+        component: _import("errorLog/index"),
+        name: "errorLog",
+        meta: {
+          title: "errorLog",
+          icon: "bug"
+        }
       }
-    }]
+    ]
   },
 
   {
-    path: '*',
-    redirect: '/404',
+    path: "*",
+    redirect: "/404",
     hidden: true
   }
 ];

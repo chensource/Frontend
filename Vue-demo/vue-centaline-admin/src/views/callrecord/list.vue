@@ -174,11 +174,11 @@
           <el-form-item label="邀约到访" :disabled=" temp.isConnected === 'false'">
             <el-switch v-model="temp.isInvitation"></el-switch>
           </el-form-item>
-          <el-form-item :label="temp.isTransfer ? '项目转介':'约看成功'" :disabled=" temp.isConnected === 'false'">
+          <el-form-item :label="temp.isNewprop ? '项目转介':'约看成功'" :disabled=" temp.isConnected === 'false'">
             <el-switch v-model="temp.isTransfer"></el-switch>
           </el-form-item>
           <el-form-item label="评分" :disabled=" temp.isConnected === 'false'">
-            <el-rate style="margin-top:8px;" show-score v-model="temp.score" :colors="['#99A9BF', '#F7BA2A', '#FF9900']"></el-rate>
+             <el-input-number v-model="temp.score" width=50px; :max='100' :step='5' :min='0' placeholder="评分"></el-input-number>
           </el-form-item>
            <el-form-item label="备注信息" :disabled=" temp.isConnected === 'false'">
             <el-input v-model="temp.remark" style="width:400px;" :rows="3" placeholder="单价" type="textarea"></el-input>
@@ -324,7 +324,7 @@ export default {
         isPatienty: false,
         isInvitation: false,
         isTransfer: false,
-        score: null,
+        score: 0,
         calledStatus: 0,
         timestamp: new Date()
       },

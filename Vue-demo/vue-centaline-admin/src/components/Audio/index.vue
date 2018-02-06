@@ -92,7 +92,7 @@ export default {
         // 不显示音量条
         noVolume: true,
         // 不显示进度条
-        noProcess: true,
+        noProcess: false,
         // 只能播放一个
         onlyOnePlaying: false,
         // 不要快进按钮
