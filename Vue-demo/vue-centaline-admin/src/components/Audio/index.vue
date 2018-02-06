@@ -10,10 +10,10 @@
             @timeupdate="onTimeupdate"
             @loadedmetadata="onLoadedmetadata"
     ></audio>
-    <div v-if="!theError">
+    <div class="main-tools" v-if="!theError">
       <el-button type="text" @click="startPlayOrPause">
-        <svg-icon :icon-class="thePlaying ? 'pause':'player'" />
-        {{ thePlaying | transPlayPause }}
+        <svg-icon :icon-class="this.audio.playing ? 'pause':'player'" />
+        {{ this.audio.playing | transPlayPause }}
       </el-button>
       <el-button v-show="!controlList.noSpeed" type="text" @click="changeSpeed">{{audio.speed | transSpeed}}</el-button>
       <el-tag type="info">{{ audio.currentTime | formatSecond}}</el-tag>
@@ -64,10 +64,6 @@ export default {
     theError: {
       type: Boolean,
       default: false
-    },
-    thePlaying: {
-      type: Boolean,
-      default: false
     }
   },
   data() {
@@ -79,14 +75,15 @@ export default {
         muted: false,
         speed: 1,
         waiting: true,
-        preload: "auto"
+        preload: "auto",
+        playing: false
       },
       sliderTime: 0,
       volume: 100,
       speeds: this.theSpeeds,
       controlList: {
         // 不显示下载
-        noDownload: true,
+        noDownload: false,
         // 不显示静音
         noMuted: true,
         // 不显示音量条
@@ -96,7 +93,7 @@ export default {
         // 只能播放一个
         onlyOnePlaying: false,
         // 不要快进按钮
-        noSpeed: true
+        noSpeed: false
       }
     };
   },
@@ -137,7 +134,7 @@ export default {
       this.$refs.audio.currentTime = parseInt(index / 100 * this.audio.maxTime);
     },
     startPlayOrPause() {
-      return this.thePlaying ? this.pausePlay() : this.startPlay();
+      return this.audio.playing ? this.pausePlay() : this.startPlay();
     },
     // 开始播放
     startPlay() {
@@ -149,7 +146,7 @@ export default {
     },
     // 当音频暂停
     onPause() {
-      this.thePlaying = false;
+      this.audio.playing = false;
     },
     // 当发生错误, 就出现loading状态
     onError() {
@@ -162,7 +159,7 @@ export default {
     },
     // 当音频开始播放
     onPlay(res) {
-      this.thePlaying = true;
+      this.audio.playing = true;
       this.audio.loading = false;
 
       if (!this.controlList.onlyOnePlaying) {
@@ -214,21 +211,26 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.di {
+  display: flex;
+}
+
+.main-wrap {
+  padding: 0px;
+  text-align: inherit;
+}
+
 .slider {
   display: inline-block;
   width: 100px;
   position: relative;
   top: 14px;
-  margin-left: 15px;
-}
-
-.di {
-  display: inline-block;
+  margin-left: 10px;
 }
 
 .download {
+  padding-left: 10px;
   color: #409eff;
-  margin-left: 15px;
 }
 
 .dn {

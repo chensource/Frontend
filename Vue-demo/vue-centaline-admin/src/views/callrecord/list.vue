@@ -1,17 +1,28 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <el-date-picker  class="filter-item"
-        v-model="dateRange"
-        type="daterange"
-        range-separator="-"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        :picker-options="pickerOptions"
-        unlink-panels
+      <el-date-picker  style="width:145px;" class="filter-item"
+        v-model="listQuery.beginTime"
+        type="date"
+        placeholder="开始时间"
         value-format="yyyy-MM-dd"
-      >
-      </el-date-picker>
+        :editable = false
+        :picker-options="beginTimeOptions"
+        name="beginTime"
+        id="beginTime"
+      ></el-date-picker>
+      <el-date-picker style="width:145px;"  class="filter-item"
+        v-model="listQuery.endTime"
+        type="date"
+        :editable = false
+        placeholder="结束时间"
+        value-format="yyyy-MM-dd"
+        name="endTime"
+        id="endTime"
+        :picker-options="endTimeOptions"
+      ></el-date-picker>
+      <el-input clearable class="filter-item" style="width: 120px" v-model="listQuery.keyId" placeholder="通话编号"></el-input>
+
       <el-select clearable class="filter-item" style="width: 120px" v-model="listQuery.isnewprop" placeholder="类型">
         <el-option v-for="item in sourceOptions" :key="item.key" :label="item.name" :value="item.value">
         </el-option>
@@ -112,7 +123,7 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-width="100px" label-position="left" style='width: 600px; margin:20px 0 0 70px;'>
         <div v-show="stepQuery.step == 1">
           <el-form-item label="通话录音">
-            <VueAudio :theUrl="audioStr" :theError="false" :thePlaying="playing" />
+            <VueAudio v-if="showAudio" :theUrl="audioStr" :theError="false" />
           </el-form-item>
           <el-form-item label="来电项目">
             <span>{{ temp.calledMsg }}</span>
@@ -157,10 +168,8 @@
           </el-form-item>
           <el-form-item label="面积">
             <el-input-number lable="最小面积" v-model="temp.minArea" :disabled=" temp.isConnected === 'false'">
-              {{ temp.isConnected === 'false' ? 0:50 }}
             </el-input-number>
-            <el-input-number lable="最大面积" :min="60" :max='500' v-model="temp.maxArea" :disabled=" temp.isConnected === 'false'">
-              {{ temp.isConnected === 'false' ? 0:50 }}
+            <el-input-number lable="最大面积" v-model="temp.maxArea" :disabled=" temp.isConnected === 'false'">
             </el-input-number>
           </el-form-item>
         </div>
@@ -217,54 +226,26 @@ export default {
       list: null,
       total: null,
       listLoading: true,
-      dateRange: "",
-      playing: false,
+      showAudio: true,
       listQuery: {
+        keyId: null,
         page: 1,
         limit: 10,
         iscentaline: null,
-        type: undefined,
         isnewprop: null,
         calledStatus: 0,
         beginTime: "",
         endTime: ""
       },
-      pickerOptions: {
+      beginTimeOptions: {
         disabledDate: time => {
-          const endDateVal = this.listQuery.endTime;
-          if (endDateVal) {
-            return time.getTime() > endDateVal;
-          }
-        },
-        shortcuts: [
-          {
-            text: "最近一周",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "最近一个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "最近三个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
-            }
-          }
-        ]
+          return time.getTime() > Date.now();
+        }
+      },
+      endTimeOptions: {
+        disabledDate: time => {
+          return time.getTime() > Date.now();
+        }
       },
       tradeOptions: [
         {
@@ -359,10 +340,6 @@ export default {
     }
   },
   created() {
-    const endtime = new Date();
-    const start = new Date();
-    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-    this.dateRange = [start, endtime];
     this.getList();
   },
   computed: {
@@ -378,8 +355,13 @@ export default {
   methods: {
     getList() {
       this.listLoading = true;
-      this.listQuery.beginTime = this.dateRange[0];
-      this.listQuery.endTime = this.dateRange[1];
+      if (this.listQuery.beginTime === "" || this.listQuery.endTime === "") {
+        const endtime = new Date();
+        const start = new Date();
+        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+        this.listQuery.beginTime = parseTime(start, "{y}-{m}-{d}");
+        this.listQuery.endTime = parseTime(endtime, "{y}-{m}-{d}");
+      }
 
       fetchList(this.listQuery).then(response => {
         this.list = response.data.data.items;
@@ -433,6 +415,7 @@ export default {
       this.getList();
     },
     handleUpdate(row) {
+      this.showAudio = true;
       this.temp = Object.assign({}, row); // copy obj
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
@@ -466,7 +449,7 @@ export default {
         preStep: false,
         nextStep: true
       };
-      this.playing = false;
+      this.showAudio = false;
     },
     handleDialogClose() {
       this.resetStepQuery();
