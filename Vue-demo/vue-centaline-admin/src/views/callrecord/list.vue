@@ -21,7 +21,7 @@
         id="endTime"
         :picker-options="endTimeOptions"
       ></el-date-picker>
-      <el-input clearable class="filter-item" style="width: 120px" v-model="listQuery.keyId" placeholder="通话编号"></el-input>
+      <el-input clearable class="filter-item" style="width: 120px" v-model="listQuery.keyId" placeholder="编号"></el-input>
 
       <el-select clearable class="filter-item" style="width: 120px" v-model="listQuery.isnewprop" placeholder="类型">
         <el-option v-for="item in sourceOptions" :key="item.key" :label="item.name" :value="item.value">
