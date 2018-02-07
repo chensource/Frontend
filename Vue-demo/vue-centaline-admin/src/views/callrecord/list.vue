@@ -21,7 +21,7 @@
         id="endTime"
         :picker-options="endTimeOptions"
       ></el-date-picker>
-      <el-input clearable class="filter-item" style="width: 120px" v-model="listQuery.keyId" placeholder="编号"></el-input>
+      <el-input clearable class="filter-item" style="width: 120px" v-model="listQuery.callId" placeholder="通话编号"></el-input>
 
       <el-select clearable class="filter-item" style="width: 120px" v-model="listQuery.isnewprop" placeholder="类型">
         <el-option v-for="item in sourceOptions" :key="item.key" :label="item.name" :value="item.value">
@@ -95,6 +95,11 @@
           <el-tag :type="scope.row.isEvaluation | iconFilter">
             <span :class="scope.row.isEvaluation?'el-icon-success':'el-icon-error'"></span>
           </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column min-width="70px"  align="center" label="评分">
+        <template slot-scope="scope">
+           <span>{{ scope.row.score ? scope.row.score:'-'}}</span>
         </template>
       </el-table-column>
       <el-table-column min-width="70px"  align="center" label="评价人">
@@ -237,7 +242,7 @@ export default {
       listLoading: true,
       showAudio: true,
       listQuery: {
-        keyId: null,
+        callId: null,
         page: 1,
         limit: 10,
         iscentaline: null,

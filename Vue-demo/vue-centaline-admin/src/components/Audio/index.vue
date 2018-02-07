@@ -10,7 +10,7 @@
             @timeupdate="onTimeupdate"
             @loadedmetadata="onLoadedmetadata"
     ></audio>
-    <div class="main-tools" v-if="!theError">
+    <div class="main-tools" v-if="!this.audio.errored">
       <el-button type="text" @click="startPlayOrPause">
         <svg-icon :icon-class="this.audio.playing ? 'pause':'player'" />
         {{ this.audio.playing | transPlayPause }}
@@ -76,7 +76,8 @@ export default {
         speed: 1,
         waiting: true,
         preload: "auto",
-        playing: false
+        playing: false,
+        errored: this.theError
       },
       sliderTime: 0,
       volume: 100,
@@ -150,7 +151,7 @@ export default {
     },
     // 当发生错误, 就出现loading状态
     onError() {
-      this.theError = true;
+      this.audio.errored = true;
       this.audio.waiting = false;
     },
     // 当音频开始等待
