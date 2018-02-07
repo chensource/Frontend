@@ -104,7 +104,12 @@
       </el-table-column>
       <el-table-column align="center" label="操作" class-name="small-padding">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" :disabled="scope.row.isEvaluation || scope.row.calledStatus !== 0" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button v-if="scope.row.isEvaluation" type="primary" size="mini" :disabled="scope.row.calledStatus !== 0"  @click="handleUpdate(scope.row)">
+              编辑
+          </el-button>
+          <el-button v-else size="mini" :disabled="scope.row.calledStatus !== 0" @click="handleCreate(scope.row)">
+              创建
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -144,53 +149,56 @@
         <div v-show="stepQuery.step == 2">
           <el-form-item label="是否接通" prop="isConnected" required>
             <el-radio-group v-model="temp.isConnected" >
-              <el-radio label="true">是</el-radio>
-              <el-radio label="false">否</el-radio>
+              <el-radio :label="true">是</el-radio>
+              <el-radio :label="false">否</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="是否有效" prop="isEffective">
             <el-radio-group v-model="temp.isEffective">
-              <el-radio label="true">是</el-radio>
-              <el-radio label="false">否</el-radio>
+              <el-radio :label="true">是</el-radio>
+              <el-radio :label="false">否</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="意向区域">
-            <el-input v-model="temp.intentionArea" placeholder="意向区域" :disabled=" temp.isConnected === 'false'" style="width: 250px"></el-input>
+            <el-input v-model="temp.intentionArea" placeholder="意向区域" style="width: 250px"></el-input>
           </el-form-item>
           <el-form-item label="物业类型">
-            <el-select clearable class="filter-item" style="width: 250px" v-model="temp.propertyType" placeholder="物业类型" :disabled=" temp.isConnected === 'false'">
+            <el-select clearable class="filter-item" style="width: 250px" v-model="temp.propertyType" placeholder="物业类型" >
               <el-option v-for="item in propertyTypeOptions" :key="item.key" :label="item.name" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="单价">
-            <el-input-number v-model="temp.unitPrice" placeholder="单价" :disabled=" temp.isConnected === 'false'" style="width: 250px"></el-input-number>
+            <el-input-number v-model="temp.unitPrice" placeholder="单价" style="width: 250px"></el-input-number>
           </el-form-item>
           <el-form-item label="面积">
-            <el-input-number lable="最小面积" v-model="temp.minArea" :disabled=" temp.isConnected === 'false'">
+            <el-input-number lable="最小面积" v-model="temp.minArea">
             </el-input-number>
-            <el-input-number lable="最大面积" v-model="temp.maxArea" :disabled=" temp.isConnected === 'false'">
+            <el-input-number lable="最大面积" v-model="temp.maxArea">
             </el-input-number>
           </el-form-item>
         </div>
         <div v-show="stepQuery.step == 3">
-          <el-form-item label="礼貌用语" :disabled=" temp.isConnected === 'false'">
+          <el-form-item label="礼貌用语">
             <el-switch v-model="temp.isCourtesy"></el-switch>
           </el-form-item>
-          <el-form-item :label="temp.isNewprop ? '耐心解答':'房源信息'" :disabled=" temp.isConnected === 'false'">
+          <el-form-item :label="temp.isNewprop ? '耐心解答':'房源信息'">
             <el-switch v-model="temp.isPatienty"></el-switch>
           </el-form-item>
-          <el-form-item label="邀约到访" :disabled=" temp.isConnected === 'false'">
+          <el-form-item label="客户需求" v-if="!temp.isNewprop">
+            <el-switch v-model="temp.isRequirement"></el-switch>
+          </el-form-item>
+          <el-form-item label="邀约到访">
             <el-switch v-model="temp.isInvitation"></el-switch>
           </el-form-item>
-          <el-form-item :label="temp.isNewprop ? '项目转介':'约看成功'" :disabled=" temp.isConnected === 'false'">
+          <el-form-item :label="temp.isNewprop ? '项目转介':'约看成功'" >
             <el-switch v-model="temp.isTransfer"></el-switch>
           </el-form-item>
-          <el-form-item label="评分" :disabled=" temp.isConnected === 'false'">
+          <el-form-item label="评分" >
              <el-input-number v-model="temp.score" width=50px; :max='100' :step='5' :min='0' placeholder="评分"></el-input-number>
           </el-form-item>
-           <el-form-item label="备注信息" :disabled=" temp.isConnected === 'false'">
-            <el-input v-model="temp.remark" style="width:400px;" :rows="3" placeholder="单价" type="textarea"></el-input>
+           <el-form-item label="备注信息" >
+            <el-input v-model="temp.remark" style="width:400px;" :rows="3" placeholder="备注信息" type="textarea"></el-input>
           </el-form-item>
         </div>
       </el-form>
@@ -198,14 +206,15 @@
         <el-button @click="handlePreStep" v-show="stepQuery.preStep">上一步</el-button>
         <el-button @click="handleNextStep" v-show="stepQuery.nextStep">下一步</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button v-show="stepQuery.step == 3" type="primary" @click="createData">确 定</el-button>
+        <el-button v-show="stepQuery.step==3" v-if="dialogStatus=='create'" type="primary" @click="createData">确定添加</el-button>
+        <el-button v-show="stepQuery.step==3" v-else type="primary" @click="updateData">确定修改</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, create } from "@/api/callrecord";
+import { fetchList, create, update, fetchOne } from "@/api/callrecord";
 // import store from "./store";
 
 import waves from "@/directive/waves"; // 水波纹指令
@@ -292,22 +301,23 @@ export default {
         { keyid: 5, value: "其他", name: "其他" }
       ],
       temp: {
-        callId: undefined,
-        isConnected: null,
+        callId: 0,
+        isConnected: false,
         isEffective: true,
-        propertyType: null,
-        intentionArea: null,
-        unitPrice: null,
-        minArea: null,
-        maxArea: null,
-        remark: null,
+        propertyType: "",
+        intentionArea: "",
+        unitPrice: 0.0,
+        minArea: 0,
+        maxArea: 0,
+        remark: "",
+        isRequirement: false,
         isCourtesy: false,
         isPatienty: false,
         isInvitation: false,
         isTransfer: false,
         score: 0,
         calledStatus: 0,
-        timestamp: new Date()
+        updateTime: new Date()
       },
       stepQuery: {
         step: 1,
@@ -414,11 +424,11 @@ export default {
       this.listQuery.page = val;
       this.getList();
     },
-    handleUpdate(row) {
+    handleCreate(row) {
       this.showAudio = true;
-      this.temp = Object.assign({}, row); // copy obj
-      this.dialogStatus = "update";
+      this.dialogStatus = "create";
       this.dialogFormVisible = true;
+      this.temp = Object.assign({}, row); // copy obj
       this.$nextTick(() => {
         this.$refs["dataForm"].clearValidate();
       });
@@ -433,6 +443,41 @@ export default {
               this.$notify({
                 title: "成功",
                 message: "添加成功",
+                type: "success",
+                duration: 2000
+              });
+            }
+            this.getList();
+            this.resetStepQuery();
+          });
+        }
+      });
+    },
+    handleUpdate(row) {
+      this.showAudio = true;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      fetchOne(row.callId).then(response => {
+        var data = response.data;
+        if (data.meta.code === 0) {
+          this.temp = Object.assign(data.data, row);
+        }
+      });
+
+      this.$nextTick(() => {
+        this.$refs["dataForm"].clearValidate();
+      });
+    },
+    updateData() {
+      this.$refs["dataForm"].validate(valid => {
+        if (valid) {
+          update(this.temp).then(response => {
+            var data = response.data;
+            if (data.meta.code === 0) {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "成功",
+                message: "修改成功",
                 type: "success",
                 duration: 2000
               });
