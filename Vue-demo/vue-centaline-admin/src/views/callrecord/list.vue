@@ -90,13 +90,6 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column min-width="70px"  align="center" label="是否评价">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.isEvaluation | iconFilter">
-            <span :class="scope.row.isEvaluation?'el-icon-success':'el-icon-error'"></span>
-          </el-tag>
-        </template>
-      </el-table-column>
       <el-table-column min-width="70px"  align="center" label="评分">
         <template slot-scope="scope">
            <span>{{ scope.row.score ? scope.row.score:'-'}}</span>
