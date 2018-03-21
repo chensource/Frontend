@@ -34,6 +34,7 @@
 <script>
 // import { isvalidUsername } from "@/utils/validate";
 import socialSign from "./socialsignin";
+import { Message } from "element-ui";
 
 export default {
   components: {
@@ -91,6 +92,7 @@ export default {
               this.$router.push({ path: "/" });
             })
             .catch(() => {
+              Message.error("账号或者密码错误,请重新登录");
               this.loading = false;
             });
         } else {

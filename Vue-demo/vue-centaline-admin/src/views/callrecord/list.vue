@@ -213,8 +213,6 @@
 
 <script>
 import { fetchList, create, update, fetchOne } from "@/api/callrecord";
-// import store from "./store";
-
 import waves from "@/directive/waves"; // 水波纹指令
 import { parseTime } from "@/utils";
 import VueAudio from "@/components/Audio";
@@ -433,6 +431,7 @@ export default {
     },
     createData() {
       this.$refs["dataForm"].validate(valid => {
+        this.listLoading = true;
         if (valid) {
           create(this.temp).then(response => {
             var data = response.data;
@@ -445,6 +444,7 @@ export default {
                 duration: 2000
               });
             }
+            this.listLoading = false;
             this.getList();
             this.resetStepQuery();
           });

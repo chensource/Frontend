@@ -86,45 +86,6 @@ export default new Router({
   routes: constantRouterMap
 });
 export const asyncRouterMap = [
-  // {
-  //   path: '/components',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   name: 'component-demo',
-  //   meta: {
-  //     title: 'components',
-  //     icon: 'component'
-  //   },
-  //   children: [
-  //     { path: 'tinymce', component: _import('components-demo/tinymce'), name: 'tinymce-demo', meta: { title: 'tinymce' }},
-  //     { path: 'markdown', component: _import('components-demo/markdown'), name: 'markdown-demo', meta: { title: 'markdown' }},
-  //     { path: 'json-editor', component: _import('components-demo/jsonEditor'), name: 'jsonEditor-demo', meta: { title: 'jsonEditor' }},
-  //     { path: 'dnd-list', component: _import('components-demo/dndList'), name: 'dndList-demo', meta: { title: 'dndList' }},
-  //     { path: 'splitpane', component: _import('components-demo/splitpane'), name: 'splitpane-demo', meta: { title: 'splitPane' }},
-  //     { path: 'avatar-upload', component: _import('components-demo/avatarUpload'), name: 'avatarUpload-demo', meta: { title: 'avatarUpload' }},
-  //     { path: 'dropzone', component: _import('components-demo/dropzone'), name: 'dropzone-demo', meta: { title: 'dropzone' }},
-  //     { path: 'sticky', component: _import('components-demo/sticky'), name: 'sticky-demo', meta: { title: 'sticky' }},
-  //     { path: 'count-to', component: _import('components-demo/countTo'), name: 'countTo-demo', meta: { title: 'countTo' }},
-  //     { path: 'mixin', component: _import('components-demo/mixin'), name: 'componentMixin-demo', meta: { title: 'componentMixin' }},
-  //     { path: 'back-to-top', component: _import('components-demo/backToTop'), name: 'backToTop-demo', meta: { title: 'backToTop' }}
-  //   ]
-  // },
-
-  // {
-  //   path: '/charts',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   name: 'charts',
-  //   meta: {
-  //     title: 'charts',
-  //     icon: 'chart'
-  //   },
-  //   children: [
-  //     { path: 'keyboard', component: _import('charts/keyboard'), name: 'keyboardChart', meta: { title: 'keyboardChart', noCache: true }},
-  //     { path: 'line', component: _import('charts/line'), name: 'lineChart', meta: { title: 'lineChart', noCache: true }},
-  //     { path: 'mixchart', component: _import('charts/mixChart'), name: 'mixChart', meta: { title: 'mixChart', noCache: true }}
-  //   ]
-  // },
   {
     path: "/callrecord",
     component: Layout,
@@ -146,10 +107,58 @@ export const asyncRouterMap = [
             component: _import("callrecord/list"),
             name: "callrecord-list",
             meta: {
-              title: "callrecordlist"
+              title: "callrecordlist",
+              icon: "table"
             }
           }
         ]
+      }
+    ]
+  },
+  {
+    path: "/newprop",
+    component: Layout,
+    redirect: "/newprop/list",
+    name: "newprop",
+    meta: {
+      title: "newprop",
+      icon: "home"
+    },
+    children: [
+      {
+        path: "/newprop/list",
+        component: _import("contract/table/index"),
+        redirect: "/newprop",
+        name: "Table",
+        children: [
+          {
+            path: "newprop-list",
+            component: _import("newprop/list"),
+            name: "newprop-list",
+            meta: {
+              title: "newproplist",
+              icon: "table"
+            }
+          }
+        ]
+      },
+      {
+        path: "newprop-info",
+        component: _import("newprop/info"),
+        name: "newprop-info",
+        meta: {
+          title: "newpropinfo",
+          icon: "info"
+        }
+      },
+      {
+        path: "newprop-price",
+        component: _import("newprop/info"),
+        name: "newprop-price",
+        meta: {
+          title: "newpropprice",
+          icon: "price"
+        }
       }
     ]
   },
@@ -250,7 +259,6 @@ export const asyncRouterMap = [
       }
     ]
   },
-
   {
     path: "*",
     redirect: "/404",
