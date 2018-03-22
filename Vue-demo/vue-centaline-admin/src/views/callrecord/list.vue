@@ -117,7 +117,7 @@
       </el-pagination>
     </div>
 
-    <el-dialog   :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" @close="handleDialogClose()">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" @close="handleDialogClose()">
       <el-steps :active="stepQuery.step" align-center finish-status="success">
         <el-step title="基本信息"></el-step>
         <el-step title="客户信息"></el-step>

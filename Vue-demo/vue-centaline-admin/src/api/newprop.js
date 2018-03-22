@@ -16,6 +16,13 @@ export function fetchInfoList(query) {
   });
 }
 
+export function fetchNewpropOptions() {
+  return request({
+    url: "/newprop/newprop-options",
+    method: "get"
+  });
+}
+
 export function fetchPriceList(query) {
   return request({
     url: "/newprop/price",

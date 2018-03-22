@@ -100,7 +100,6 @@ export const asyncRouterMap = [
         path: "/contract/list",
         component: _import("contract/table/index"),
         redirect: "/callrecord",
-        name: "Table",
         children: [
           {
             path: "callrecord-list",
@@ -118,7 +117,6 @@ export const asyncRouterMap = [
   {
     path: "/newprop",
     component: Layout,
-    redirect: "/newprop/list",
     name: "newprop",
     meta: {
       title: "newprop",
@@ -129,7 +127,6 @@ export const asyncRouterMap = [
         path: "/newprop/list",
         component: _import("contract/table/index"),
         redirect: "/newprop",
-        name: "Table",
         children: [
           {
             path: "newprop-list",
@@ -182,9 +179,6 @@ export const asyncRouterMap = [
           title: "dealTable"
         },
         children: [
-          // { path: 'dynamic-table', component: _import('contract/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: 'dynamicTable' }},
-          // { path: 'drag-table', component: _import('contract/table/dragTable'), name: 'dragTable', meta: { title: 'dragTable' }},
-          // { path: 'inline-edit-table', component: _import('contract/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'inlineEditTable' }},
           {
             path: "deal-table",
             component: _import("contract/table/dealTable"),
