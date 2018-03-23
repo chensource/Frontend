@@ -461,7 +461,6 @@ export default {
           this.temp = Object.assign(data.data, row);
         }
       });
-
       this.$nextTick(() => {
         this.$refs["dataForm"].clearValidate();
       });

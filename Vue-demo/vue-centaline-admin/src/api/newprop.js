@@ -38,3 +38,11 @@ export function fetchNewpropOne(newCode) {
     params: { newCode }
   });
 }
+
+export function createRelation(data) {
+  return request({
+    url: "/newprop/newprop-relation",
+    method: "post",
+    data
+  });
+}
