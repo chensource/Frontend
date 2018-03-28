@@ -46,3 +46,11 @@ export function createRelation(data) {
     data
   });
 }
+
+export function createNewPropSync(newcode) {
+  return request({
+    url: "/newprop/newprop-sync",
+    method: "get",
+    params: { newcode }
+  });
+}

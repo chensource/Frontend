@@ -34,14 +34,9 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column min-width="90px" align="center" label="地址">
+      <el-table-column min-width="90px" align="center" label="区域">
         <template slot-scope="scope">
-          <el-popover trigger="hover" placement="right">
-            <p>{{ scope.row.address }}</p>
-            <div slot="reference" class="name-wrapper">
-              <el-tag size="medium">{{ scope.row.area }}</el-tag>
-            </div>
-          </el-popover>
+          <el-tag size="medium">{{ scope.row.area }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column min-width="90px" align="center" label="销售状态">
@@ -66,7 +61,7 @@
       <el-table-column align="center" label="操作" class-name="small-padding">
         <template slot-scope="scope">
           <el-button size="small" type="text" :disabled="scope.row.isBind" @click="handleBinding(scope.row)">绑定</el-button>
-          <el-button size="small" type="text" :disabled="!scope.row.isBind" @click="handleSync(scope.row.newcode)">同步</el-button>
+          <el-button size="small" type="text" :disabled="!scope.row.isBind" @click="handleSync(scope.row.newCode)">同步</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -136,7 +131,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button v-if="dialogStatus=='create'" :loading="loading" type="primary" @click="createData()">确定绑定</el-button>
+        <el-button v-if="dialogStatus=='create'" :loading="btnloading" type="primary" @click="createData()">确定绑定</el-button>
         <el-button v-else type="primary" @click="updateData()">修改绑定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
       </div>
@@ -148,7 +143,8 @@
 import {
   fetchNewpropList,
   fetchNewpropOptions,
-  createRelation
+  createRelation,
+  createNewPropSync
 } from "@/api/newprop";
 
 import waves from "@/directive/waves"; // 水波纹指令
@@ -166,6 +162,7 @@ export default {
       list: null,
       listLoading: true,
       loading: false,
+      btnloading: false,
       newpropNo: "",
       childNo: "",
       listQuery: {
@@ -270,13 +267,13 @@ export default {
       this.childNo = "";
     },
     createData() {
-      this.loading = true;
+      this.btnloading = true;
       this.temp.estId = this.newpropNo;
       this.temp.estExtId = this.childNo;
 
       createRelation(this.temp).then(response => {
         this.dialogFormVisible = false;
-        this.loading = false;
+        this.btnloading = false;
         this.$notify({
           title: "成功",
           message: "绑定成功",
@@ -293,15 +290,25 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$notify({
-            type: "success",
-            message: "同步成功!"
+          createNewPropSync(newcode).then(response => {
+            var result = response.data;
+
+            var code = result.meta.code;
+            var type = code === 0 ? "success" : "error";
+            var message = code === 0 ? "同步成功" : result.meta.message;
+            this.$notify({
+              title: "提示",
+              type: type,
+              message: message,
+              duration: 2000
+            });
           });
         })
         .catch(() => {
           this.$notify({
             type: "error",
-            message: "已取消"
+            message: "已取消",
+            duration: 1000
           });
         });
     }
