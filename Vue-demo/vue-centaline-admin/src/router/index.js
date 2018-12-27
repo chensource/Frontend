@@ -138,24 +138,6 @@ export const asyncRouterMap = [
             }
           }
         ]
-      },
-      {
-        path: "newprop-info",
-        component: _import("newprop/info"),
-        name: "newprop-info",
-        meta: {
-          title: "newpropinfo",
-          icon: "info"
-        }
-      },
-      {
-        path: "newprop-price",
-        component: _import("newprop/info"),
-        name: "newprop-price",
-        meta: {
-          title: "newpropprice",
-          icon: "price"
-        }
       }
     ]
   },
